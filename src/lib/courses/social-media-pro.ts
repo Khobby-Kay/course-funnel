@@ -1,0 +1,263 @@
+import type { CourseDefinition } from "./types";
+
+export const socialMediaProCourse: CourseDefinition = {
+  id: "social-media-pro",
+  slug: "social-media-pro",
+  badge: "SM",
+  brandName: "Social Media Pro",
+  status: "published",
+  catalog: {
+    tagline: "Manage accounts that pay you monthly",
+    description:
+      "Learn to run Instagram & TikTok for local businesses — pricing, packages, content systems, and client delivery from zero.",
+    emoji: "📱",
+    highlights: [
+      "18 lessons · 4 modules",
+      "Content batching templates",
+      "14-day action plan",
+    ],
+  },
+  marketing: {
+    course: {
+      title: "Social Media Pro",
+      headline: "Turn Scroll Time Into Retainer Income — Manage Social Accounts for Local Businesses",
+      subheadline:
+        "A practical 14-day program for beginners who want recurring GHS 500–1,500/month retainers managing social media for salons, restaurants, and shops.",
+      price: 299,
+      oldPrice: 599,
+      totalValue: 1800,
+      currency: "GHS",
+      lessons: "18+",
+      duration: "14 Days",
+      rating: 4.9,
+      students: "400+",
+      discount: "LAUNCH OFFER — 50% OFF",
+      roiStatement: "One retainer pays for this course 2× over",
+      guaranteeDays: 30,
+    },
+    navLinks: [
+      { label: "Curriculum", href: "#modules" },
+      { label: "What's Included", href: "#offer" },
+      { label: "Results", href: "#testimonials" },
+      { label: "FAQ", href: "#faq" },
+    ],
+    heroOutcomes: [
+      "Package a sellable social media service",
+      "Create 30 days of content in one sitting",
+      "Pitch local businesses with confidence",
+      "Lifetime access — learn at your pace",
+    ],
+    painAgitateSolution: [
+      {
+        icon: "😩",
+        title: "The Problem",
+        description:
+          "You know social media but don't know how to turn it into paid work. Businesses need help — you just need a system.",
+        accent: "border-red-200 bg-red-50/80",
+      },
+      {
+        icon: "💸",
+        title: "The Opportunity",
+        description:
+          "Every salon, restaurant, and shop near you needs consistent posts. Most owners will pay GHS 500+/month if you deliver results.",
+        accent: "border-orange-200 bg-orange-50/80",
+      },
+      {
+        icon: "🚀",
+        title: "The System",
+        description:
+          "4 modules: service packaging → content creation → client acquisition → delivery & retainers. Templates included.",
+        accent: "border-purple/20 bg-purple/5",
+      },
+    ],
+    transformation: {
+      before: [
+        "Posting for free with no clients",
+        "No clear service or price",
+        "Overwhelmed by content creation",
+        "Unsure how to pitch businesses",
+      ],
+      after: [
+        "Clear retainer offer with pricing",
+        "Batch content in hours, not days",
+        "Outreach scripts that get replies",
+        "Delivery checklist clients love",
+      ],
+    },
+    howItWorks: [
+      {
+        step: 1,
+        title: "Enroll & Unlock Everything",
+        description: "Pay once. Access all modules, templates, and bonuses instantly.",
+      },
+      {
+        step: 2,
+        title: "Build Your Service Package",
+        description: "Define deliverables, pricing, and a mini portfolio in the first week.",
+      },
+      {
+        step: 3,
+        title: "Land Your First Retainer",
+        description: "Use the outreach and proposal system to close a monthly client.",
+      },
+    ],
+    valueStack: [
+      { name: "Social Media Pro Course (18+ lessons)", value: 900 },
+      { name: "30-Day Content Batching Templates", value: 300 },
+      { name: "Client Pitch & Proposal Pack", value: 250 },
+      { name: "Monthly Reporting Template", value: 150 },
+      { name: "Hashtag & Caption Swipe File", value: 100 },
+      { name: "Private Student Community", value: 100 },
+    ],
+    modules: [
+      {
+        number: 1,
+        title: "Package Your Service",
+        description: "Define what you sell, for how much, and to whom — with done-for-you pricing tiers.",
+        icon: "📦",
+        outcome: "A retainer offer ready to sell",
+      },
+      {
+        number: 2,
+        title: "Create Content Fast",
+        description: "Batch a month of posts in one session using Canva templates and caption frameworks.",
+        icon: "🎨",
+        outcome: "A repeatable content system",
+      },
+      {
+        number: 3,
+        title: "Find & Close Clients",
+        description: "Local outreach, DMs, and discovery calls that turn into signed retainers.",
+        icon: "🤝",
+        outcome: "Your first paying client",
+      },
+      {
+        number: 4,
+        title: "Deliver & Retain",
+        description: "Reporting, upsells, and renewals — keep clients month after month.",
+        icon: "🔄",
+        outcome: "Predictable monthly income",
+      },
+    ],
+    testimonials: [
+      {
+        name: "Abena",
+        location: "Accra",
+        text: "I went from managing my own page to two salon clients in 3 weeks. The content batching module alone saved me 10+ hours a week.",
+        avatar: "A",
+        result: "2 retainers in 3 weeks",
+      },
+      {
+        name: "Yaw",
+        location: "Tema",
+        text: "The pitch templates made me sound professional even though I was brand new. Closed my first GHS 600/month client on WhatsApp.",
+        avatar: "Y",
+        result: "GHS 600/mo retainer",
+      },
+    ],
+    faqItems: [
+      {
+        question: "Do I need design skills?",
+        answer:
+          "No. We use Canva templates you customize in minutes. If you can use a phone, you can follow this course.",
+      },
+      {
+        question: "Is this different from Digital Marketing Mastery?",
+        answer:
+          "Yes. This course focuses specifically on social media management retainers — content, delivery, and client work. Digital Marketing Mastery is broader (niche, traffic, sales, scaling).",
+      },
+      {
+        question: "How long do I have access?",
+        answer: "Lifetime. One payment, all future updates included.",
+      },
+    ],
+    audience: [
+      { label: "Beginners", hook: "Start a service business from scratch" },
+      { label: "Creators", hook: "Monetize skills you already have" },
+      { label: "Students", hook: "Flexible income around your schedule" },
+      { label: "Side Hustlers", hook: "Add retainers alongside your job" },
+    ],
+    guarantee: {
+      headline: "Try It Risk-Free for 30 Days",
+      body: "Go through the course and apply the system. If it's not worth every cedi, email us within 30 days for a full refund.",
+    },
+    ctas: {
+      primary: "Yes — Give Me Instant Access",
+      secondary: "See What's Inside",
+      sticky: "Get Access — GHS 299",
+      checkout: "Complete My Enrollment",
+      final: "Start Managing Clients — Enroll Now",
+    },
+    instructor: {
+      name: "Kwame Asante",
+      title: "Social Media Strategist",
+      quote:
+        "Local businesses will pay for consistency. This course shows you exactly how to deliver it — and get paid every month.",
+    },
+  },
+  lms: {
+    modules: [
+      {
+        id: "smp-m1",
+        number: 1,
+        title: "Package Your Service",
+        icon: "📦",
+        outcome: "A retainer offer ready to sell",
+        lessons: [
+          {
+            id: "smp-m1-l1",
+            number: 1,
+            title: "What Businesses Actually Pay For",
+            duration: "10 min",
+            summary: "Understand retainer economics for local SMEs.",
+            content: [
+              "Businesses pay for consistency and results — not random posts.",
+              "Starter retainers in Ghana: GHS 400–800/month for 12–20 posts.",
+              "Your job: make them look active, professional, and trustworthy online.",
+            ],
+            actionStep: "List 5 local businesses near you that have inactive social pages.",
+          },
+          {
+            id: "smp-m1-l2",
+            number: 2,
+            title: "Build Your 3-Tier Offer",
+            duration: "12 min",
+            summary: "Create Basic, Standard, and Premium packages.",
+            content: [
+              "Basic: 8 posts/month + stories. Standard: 12 posts + DMs. Premium: 20 posts + reporting.",
+              "Price on deliverables, not hours.",
+              "Start with one clear package — don't overwhelm clients with choices.",
+            ],
+            actionStep: "Write your Standard package in one paragraph with price.",
+          },
+        ],
+      },
+      {
+        id: "smp-m2",
+        number: 2,
+        title: "Create Content Fast",
+        icon: "🎨",
+        outcome: "A repeatable content system",
+        lessons: [
+          {
+            id: "smp-m2-l1",
+            number: 1,
+            title: "The Content Batching Method",
+            duration: "14 min",
+            summary: "Create 30 days of content in one session.",
+            content: [
+              "Pick 4 content pillars: promo, behind-the-scenes, social proof, educational.",
+              "Use Canva bulk-create for consistent branding.",
+              "Schedule everything in one sitting — deliver stress-free all month.",
+            ],
+            actionStep: "Create 4 post templates in Canva for a mock client.",
+          },
+        ],
+      },
+    ],
+    bonusResources: [
+      { id: "batch", title: "30-Day Content Batching Templates", icon: "📅" },
+      { id: "pitch", title: "Client Pitch & Proposal Pack", icon: "💬" },
+    ],
+  },
+};

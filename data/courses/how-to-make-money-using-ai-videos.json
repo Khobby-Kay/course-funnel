@@ -1,0 +1,198 @@
+{
+  "id": "how-to-make-money-using-ai-videos",
+  "slug": "how-to-make-money-using-ai-videos",
+  "badge": "VIM",
+  "brandName": "Content God",
+  "status": "published",
+  "catalog": {
+    "emoji": "📚",
+    "tagline": "let us make the money together",
+    "description": "yeah step by step",
+    "highlights": [
+      "Lifetime access",
+      "Templates included"
+    ]
+  },
+  "marketing": {
+    "course": {
+      "title": "How to make money using AI videos",
+      "headline": "one time sale",
+      "subheadline": "yes",
+      "price": 49,
+      "oldPrice": 299,
+      "totalValue": 2000,
+      "currency": "GHS",
+      "lessons": "10+",
+      "duration": "14 Days",
+      "rating": 4.8,
+      "students": "100+",
+      "discount": "LAUNCH OFFER",
+      "roiStatement": "",
+      "guaranteeDays": 30
+    },
+    "navLinks": [
+      {
+        "label": "Curriculum",
+        "href": "#modules"
+      },
+      {
+        "label": "What's Included",
+        "href": "#offer"
+      },
+      {
+        "label": "Results",
+        "href": "#testimonials"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ],
+    "heroOutcomes": [
+      "Clear step-by-step roadmap",
+      "Templates you can copy and use",
+      "Lifetime access — learn at your pace"
+    ],
+    "painAgitateSolution": [
+      {
+        "icon": "😤",
+        "title": "The Problem",
+        "description": "Describe the pain your audience feels today.",
+        "accent": "border-red-200 bg-red-50/80"
+      },
+      {
+        "icon": "⏳",
+        "title": "The Cost of Waiting",
+        "description": "What happens if they don't act now.",
+        "accent": "border-orange-200 bg-orange-50/80"
+      },
+      {
+        "icon": "🎯",
+        "title": "The Solution",
+        "description": "How your program solves it.",
+        "accent": "border-purple/20 bg-purple/5"
+      }
+    ],
+    "transformation": {
+      "before": [
+        "Stuck without a clear path",
+        "No templates or system",
+        "No income from this skill"
+      ],
+      "after": [
+        "Clear offer to sell",
+        "Ready-to-use templates",
+        "Path to first paying clients"
+      ]
+    },
+    "howItWorks": [
+      {
+        "step": 1,
+        "title": "Enroll & Get Access",
+        "description": "Pay once. Unlock everything instantly."
+      },
+      {
+        "step": 2,
+        "title": "Follow the Roadmap",
+        "description": "Complete modules in order with action steps."
+      },
+      {
+        "step": 3,
+        "title": "Launch & Get Paid",
+        "description": "Apply the system and land your first results."
+      }
+    ],
+    "valueStack": [
+      {
+        "name": "How to make money using AI videos (full program)",
+        "value": 1200
+      }
+    ],
+    "modules": [
+      {
+        "number": 1,
+        "title": "Module 1 — Getting Started",
+        "description": "Foundation and first wins.",
+        "icon": "🎯",
+        "outcome": "Your first milestone"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Student",
+        "location": "Ghana",
+        "text": "Add a real testimonial after your first cohort.",
+        "avatar": "S",
+        "result": "First client in 30 days"
+      }
+    ],
+    "faqItems": [
+      {
+        "question": "How long do I have access?",
+        "answer": "Lifetime. One payment, all future updates included."
+      },
+      {
+        "question": "Is there a guarantee?",
+        "answer": "Yes — 30-day money-back guarantee if you apply the system and aren't satisfied."
+      }
+    ],
+    "audience": [
+      {
+        "label": "Beginners",
+        "hook": "Start from zero with a clear roadmap"
+      },
+      {
+        "label": "Side Hustlers",
+        "hook": "Earn alongside your current job"
+      }
+    ],
+    "guarantee": {
+      "headline": "Try It Risk-Free for 30 Days",
+      "body": "Go through the course and apply the system. If it's not worth every cedi, email us for a full refund."
+    },
+    "ctas": {
+      "primary": "Yes — Give Me Instant Access",
+      "secondary": "See What's Inside",
+      "sticky": "Get Access — GHS 49",
+      "checkout": "Complete My Enrollment",
+      "final": "Enroll Now"
+    },
+    "instructor": {
+      "name": "Your Name",
+      "title": "Course Instructor",
+      "quote": "Add your instructor quote here."
+    }
+  },
+  "lms": {
+    "modules": [
+      {
+        "id": "how-to-make-money-using-ai-videos-m1",
+        "number": 1,
+        "title": "Getting Started",
+        "icon": "🎯",
+        "outcome": "First milestone complete",
+        "lessons": [
+          {
+            "id": "how-to-make-money-using-ai-videos-m1-l1",
+            "number": 1,
+            "title": "Welcome & Overview",
+            "duration": "5 min",
+            "summary": "What you'll achieve in this program.",
+            "content": [
+              "Welcome to the course.",
+              "How to get the most from each lesson."
+            ],
+            "actionStep": "Write your #1 goal for the next 14 days."
+          }
+        ]
+      }
+    ],
+    "bonusResources": [
+      {
+        "id": "templates",
+        "title": "Resource Templates",
+        "icon": "📄"
+      }
+    ]
+  }
+}

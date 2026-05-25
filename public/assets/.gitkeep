@@ -1,0 +1,6 @@
+Drop your media files here:
+- instructor.jpg
+- video-poster.jpg
+- screenshot-1.jpg, screenshot-2.jpg, screenshot-3.jpg
+
+Then set paths in `.env.local` (see env.example).

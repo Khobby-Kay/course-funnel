@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --black: #0a0a0a;
+  --purple: #5b21b6;
+  --purple-light: #7c3aed;
+  --gold: #facc15;
+  --gold-hover: #eab308;
+  --white: #ffffff;
+  --gray-light: #f5f5f5;
+  --gray-muted: #737373;
+}
+
+@theme inline {
+  --color-black: var(--black);
+  --color-purple: var(--purple);
+  --color-purple-light: var(--purple-light);
+  --color-gold: var(--gold);
+  --color-gold-hover: var(--gold-hover);
+  --color-gray-light: var(--gray-light);
+  --color-gray-muted: var(--gray-muted);
+  --font-sans: var(--font-inter);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+[id] {
+  scroll-margin-top: 6rem;
+}

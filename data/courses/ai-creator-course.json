@@ -1,0 +1,593 @@
+{
+  "id": "ai-creator-course",
+  "slug": "ai-creator-course",
+  "badge": "AI",
+  "brandName": "AI Creator",
+  "status": "published",
+  "catalog": {
+    "tagline": "Social media, ads, short films & more — no subscriptions",
+    "description": "Master AI filmmaking in 2 days. Go viral, grow your audience, and scale with Hollywood-level VFX, profitable ads, and content systems — without expensive monthly tools.",
+    "emoji": "🎬",
+    "highlights": [
+      "6 phases · 2-day intensive",
+      "Viral editing course + templates included",
+      "No experience needed"
+    ]
+  },
+  "marketing": {
+    "course": {
+      "title": "The AI Creator Course",
+      "headline": "Master AI Filmmaking In 2 Days",
+      "subheadline": "Social Media Content, Profitable Ads, Short Films, and more! No subscriptions required. Learn how to go viral, grow your audience, and scale a business with modern AI.",
+      "price": 98,
+      "oldPrice": 298,
+      "totalValue": 494,
+      "currency": "USD",
+      "lessons": "30+",
+      "duration": "2 Days",
+      "rating": 4.9,
+      "students": "160,000+",
+      "discount": "68% OFF — LIMITED TIME",
+      "roiStatement": "One viral video can pay for this course 10× over",
+      "guaranteeDays": 30
+    },
+    "navLinks": [
+      {
+        "label": "Curriculum",
+        "href": "#modules"
+      },
+      {
+        "label": "What's Included",
+        "href": "#offer"
+      },
+      {
+        "label": "Results",
+        "href": "#testimonials"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ],
+    "heroOutcomes": [
+      "Create Hollywood-level VFX without a studio budget",
+      "Go viral on TikTok, Reels & YouTube Shorts with AI",
+      "Launch profitable ads that outperform traditional creative",
+      "Lifetime access — add videos as you grow"
+    ],
+    "painAgitateSolution": [
+      {
+        "icon": "😤",
+        "title": "The Problem",
+        "description": "Most AI tutorials show what tools do — not how to create viral videos, grow an audience, or scale a business. Creators who ignore AI are getting left behind.",
+        "accent": "border-red-200 bg-red-50/80"
+      },
+      {
+        "icon": "🔥",
+        "title": "The Shift",
+        "description": "AI won't replace creators — but creators who leverage AI will replace the ones who don't. The tools finally caught up. Now you need the strategy.",
+        "accent": "border-orange-200 bg-orange-50/80"
+      },
+      {
+        "icon": "🎬",
+        "title": "The System",
+        "description": "6 phases: filmmaking tools → growth content → graphics → thumbnails → scripting → studio & editing. No expensive subscriptions required.",
+        "accent": "border-purple/20 bg-purple/5"
+      }
+    ],
+    "transformation": {
+      "before": [
+        "Overwhelmed by AI tools and outdated tutorials",
+        "Content takes days with cameras and complex software",
+        "Ads and thumbnails cost hundreds to outsource",
+        "Ideas stuck in your head with no way to execute"
+      ],
+      "after": [
+        "Confident using the best AI tools the easy way",
+        "3–4× faster production with better results",
+        "Viral short-form, long-form, ads & short films",
+        "Professional visuals for pennies — not subscriptions"
+      ]
+    },
+    "howItWorks": [
+      {
+        "step": 1,
+        "title": "Enroll & Get Instant Access",
+        "description": "One-time payment. Unlock all 6 phases, bonus courses, and templates immediately. No subscriptions."
+      },
+      {
+        "step": 2,
+        "title": "Complete the 2-Day Roadmap",
+        "description": "Follow phase-by-phase: tools, growth, graphics, thumbnails, scripting, studio & editing."
+      },
+      {
+        "step": 3,
+        "title": "Publish & Scale",
+        "description": "Apply the workflows to YouTube, social, and paid ads — create content people beg to watch."
+      }
+    ],
+    "valueStack": [
+      {
+        "name": "The AI Creator Course (full 6-phase program)",
+        "value": 298
+      },
+      {
+        "name": "Viral Video Effects training",
+        "value": 98
+      },
+      {
+        "name": "Signature Editing Templates pack",
+        "value": 98
+      },
+      {
+        "name": "AI Thumbnail & script prompt library",
+        "value": 75
+      },
+      {
+        "name": "Lifetime updates & new modules",
+        "value": 150
+      }
+    ],
+    "modules": [
+      {
+        "number": 1,
+        "title": "The Best AI Filmmaking Tools",
+        "description": "Hollywood VFX, character consistency, AI clones, and cinematic quality — without expensive subscriptions.",
+        "icon": "🎥",
+        "outcome": "Studio-level visuals on any budget"
+      },
+      {
+        "number": 2,
+        "title": "How to Grow With AI Content",
+        "description": "Viral short-form, YouTube long-form, profitable ads, and short films — content worth watching.",
+        "icon": "📈",
+        "outcome": "An endless stream of viral ideas"
+      },
+      {
+        "number": 3,
+        "title": "AI Image & Graphic Creation",
+        "description": "Logos, channel art, product photos, and graphics in seconds — skip Photoshop and expensive designers.",
+        "icon": "🎨",
+        "outcome": "Any image you need for pennies"
+      },
+      {
+        "number": 4,
+        "title": "AI Thumbnail Engineer",
+        "description": "Spectacular thumbnails in seconds — no camera, lighting rig, or $400 designer required.",
+        "icon": "🖼️",
+        "outcome": "Click-worthy thumbnails that perform"
+      },
+      {
+        "number": 5,
+        "title": "AI Content Planning & Scriptwriting",
+        "description": "Plan a month of content in 30 minutes. Write scripts that retain attention using proven prompts.",
+        "icon": "✍️",
+        "outcome": "Scripts & calendars on autopilot"
+      },
+      {
+        "number": 6,
+        "title": "AI Studio & Video Editing",
+        "description": "Upgrade any blank wall into a studio. Edit faster with the best AI caption, audio & enhancement tools.",
+        "icon": "⚡",
+        "outcome": "Pro workflow without pro gear"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Jordan",
+        "location": "USA",
+        "text": "I went from spending a week on one YouTube video to publishing 3× more content that actually performs. The AI ad module alone changed how I run campaigns.",
+        "avatar": "J",
+        "result": "3× faster production"
+      },
+      {
+        "name": "Priya",
+        "location": "UK",
+        "text": "The thumbnail and short-form sections are gold. My first AI-made Reel hit 500K views. No expensive gear — just the system from this course.",
+        "avatar": "P",
+        "result": "500K view Reel"
+      },
+      {
+        "name": "Marcus",
+        "location": "Canada",
+        "text": "I was skeptical about AI until this course. Character consistency and clone workflows saved me hours every week. Worth every dollar.",
+        "avatar": "M",
+        "result": "Hours saved weekly"
+      }
+    ],
+    "faqItems": [
+      {
+        "question": "Do I need to know anything about AI to take this course?",
+        "answer": "No experience needed. We start from the ground up and show you the best tools the easy way — no technical background required."
+      },
+      {
+        "question": "What makes this different from free YouTube tutorials?",
+        "answer": "Most free content is outdated or generic. This course shows you how to actually use AI for viral videos, growth, ads, and business — with step-by-step workflows tested on real channels."
+      },
+      {
+        "question": "How long will it take me to complete the entire course?",
+        "answer": "The core program is designed as a 2-day intensive, but you have lifetime access. Go at your own pace and revisit modules anytime."
+      },
+      {
+        "question": "Will I need expensive software or gear?",
+        "answer": "No. We focus on tools that work without expensive monthly subscriptions. A phone and a blank wall are enough to get started."
+      },
+      {
+        "question": "Is this course only for YouTubers?",
+        "answer": "No. It's for anyone creating content — TikTok, Instagram, Facebook, YouTube, ads, short films, or building a personal brand or business online."
+      },
+      {
+        "question": "Do I get lifetime access to the course?",
+        "answer": "Yes. One payment, lifetime access including future updates and new modules we add to the program."
+      },
+      {
+        "question": "Is there a guarantee?",
+        "answer": "Absolutely. 30-day money-back guarantee. If you're not satisfied, email us for a full refund — no questions asked."
+      }
+    ],
+    "audience": [
+      {
+        "label": "New Creators",
+        "hook": "Launch YouTube, social, or a brand from zero"
+      },
+      {
+        "label": "Marketers",
+        "hook": "Bring AI-powered ads & content to your team"
+      },
+      {
+        "label": "Filmmakers",
+        "hook": "Bring short-film ideas to life with AI"
+      },
+      {
+        "label": "Business Owners",
+        "hook": "Future-proof your content strategy"
+      },
+      {
+        "label": "Side Hustlers",
+        "hook": "Create faster without burning out"
+      },
+      {
+        "label": "Agencies",
+        "hook": "Scale client deliverables with AI workflows"
+      }
+    ],
+    "guarantee": {
+      "headline": "Try It Risk-Free for 30 Days",
+      "body": "Go through the course and apply the system. If you're not satisfied for any reason, email us within 30 days for a full refund. We take the risk, not you."
+    },
+    "ctas": {
+      "primary": "Yes — Give Me Instant Access",
+      "secondary": "See What's Inside",
+      "sticky": "Get Access — $98",
+      "checkout": "Complete My Enrollment",
+      "final": "Master AI Filmmaking — Enroll Now"
+    },
+    "instructor": {
+      "name": "Anthony Gallo",
+      "title": "Co-Founder, ContentCreator.com · 160,000+ students",
+      "quote": "AI won't replace creators — but creators who leverage AI will absolutely replace the ones who don't. This is the system I wish I had when AI first blew up."
+    }
+  },
+  "media": {
+    "instructorPhoto": "/course-media/ai-creator-course/images/instructor.png",
+    "previewVideoPoster": "/course-media/ai-creator-course/images/preview-poster.png",
+    "screenshots": [
+      "/course-media/ai-creator-course/images/screenshot-0.png",
+      "/course-media/ai-creator-course/images/screenshot-1.png",
+      "/course-media/ai-creator-course/images/screenshot-2.png"
+    ]
+  },
+  "lms": {
+    "modules": [
+      {
+        "id": "aic-m1",
+        "number": 1,
+        "title": "The Best AI Filmmaking Tools",
+        "icon": "🎥",
+        "outcome": "Studio-level visuals on any budget",
+        "lessons": [
+          {
+            "id": "aic-m1-l1",
+            "number": 1,
+            "title": "Hollywood VFX With AI",
+            "duration": "Video",
+            "summary": "Create cinematic effects without a big studio budget.",
+            "content": [
+              "Use AI for explosions, lighting, environments, and motion graphics.",
+              "Bring videos to life with visuals that belong on the big screen.",
+              "Access top generators without expensive subscriptions."
+            ],
+            "actionStep": "List 3 VFX shots you want to create for your next video."
+          },
+          {
+            "id": "aic-m1-l2",
+            "number": 2,
+            "title": "Character Consistency",
+            "duration": "Video",
+            "summary": "Keep AI characters looking the same across every scene.",
+            "content": [
+              "Consistency builds trust and recognition in your content.",
+              "Learn workflows to maintain characters across scenes and projects.",
+              "Make content feel polished, professional, and connected."
+            ],
+            "actionStep": "Define one recurring character for your brand or series."
+          },
+          {
+            "id": "aic-m1-l3",
+            "number": 3,
+            "title": "Clone Yourself",
+            "duration": "Video",
+            "summary": "Create AI clones that speak and deliver content for you.",
+            "content": [
+              "Scale your on-camera presence without recording every take.",
+              "Use clones for tutorials, promos, and social content.",
+              "Stay visible while focusing on strategy and creativity."
+            ],
+            "actionStep": "Write a 30-second script your AI clone could deliver."
+          },
+          {
+            "id": "aic-m1-l4",
+            "number": 4,
+            "title": "Cinematic Quality Video Generators",
+            "duration": "Video",
+            "summary": "The top AI video tools for stunning, high-impact visuals.",
+            "content": [
+              "Compare generators that match or beat real-life footage quality.",
+              "Learn which tools to use without monthly subscription lock-in.",
+              "Pick the right tool for ads, social, and long-form."
+            ],
+            "actionStep": "Generate one test clip with your chosen video AI tool."
+          }
+        ]
+      },
+      {
+        "id": "aic-m2",
+        "number": 2,
+        "title": "How to Grow With AI Content",
+        "icon": "📈",
+        "outcome": "Content people beg to watch",
+        "lessons": [
+          {
+            "id": "aic-m2-l1",
+            "number": 1,
+            "title": "Viral Short-Form Content",
+            "duration": "Video",
+            "summary": "TikTok, Reels, Shorts — the formula for viral AI content.",
+            "content": [
+              "Beginners can go viral with the right content formula.",
+              "Replace expensive cameras and days of editing with AI workflows.",
+              "Build an endless stream of ideas you can execute fast."
+            ],
+            "actionStep": "Outline 5 short-form video ideas for this week."
+          },
+          {
+            "id": "aic-m2-l2",
+            "number": 2,
+            "title": "YouTube Long-Form Content",
+            "duration": "Video",
+            "summary": "Produce professional YouTube videos faster than ever.",
+            "content": [
+              "See how AI fits into a real YouTube growth strategy.",
+              "Work smarter, get more views, and grow your brand faster.",
+              "Pull back the curtain on production workflows that scale."
+            ],
+            "actionStep": "Map one long-form video from idea to publish using AI steps."
+          },
+          {
+            "id": "aic-m2-l3",
+            "number": 3,
+            "title": "Profitable AI Ads",
+            "duration": "Video",
+            "summary": "Create ads that crush on Meta, Google, and YouTube.",
+            "content": [
+              "AI ads outperform traditional creative — more engaging and faster to test.",
+              "Learn from $275K+ in tested AI ad strategies.",
+              "Start launches with AI ads to save time and budget."
+            ],
+            "actionStep": "Draft hooks for 3 ad variations for one offer."
+          },
+          {
+            "id": "aic-m2-l4",
+            "number": 4,
+            "title": "Short Films With AI",
+            "duration": "Video",
+            "summary": "Bring cinematic daydreams to life with artificial intelligence.",
+            "content": [
+              "Use the latest techniques for visually stunning, emotional short films.",
+              "Stay current as AI video technology advances weekly.",
+              "Amaze audiences with ideas that were impossible before AI."
+            ],
+            "actionStep": "Write a one-paragraph pitch for a 60-second AI short film."
+          }
+        ]
+      },
+      {
+        "id": "aic-m3",
+        "number": 3,
+        "title": "AI Image & Graphic Creation",
+        "icon": "🎨",
+        "outcome": "Graphics in seconds, not hours",
+        "lessons": [
+          {
+            "id": "aic-m3-l1",
+            "number": 1,
+            "title": "AI Images for Content",
+            "duration": "Video",
+            "summary": "Generate any image for pennies — no camera or Photoshop required.",
+            "content": [
+              "Fashion, product, landscape, sci-fi, and more — all from prompts.",
+              "Skip expensive gear and hours chasing the perfect shot.",
+              "Build a library of visuals for social, web, and ads."
+            ],
+            "actionStep": "Generate 5 images for your niche using prompt templates from the course."
+          },
+          {
+            "id": "aic-m3-l2",
+            "number": 2,
+            "title": "Logos & Website Graphics",
+            "duration": "Video",
+            "summary": "Professional logos and page graphics in seconds.",
+            "content": [
+              "Explore dozens of logo directions before picking one winner.",
+              "Create hero graphics and page sections without a designer.",
+              "Control every element or let AI brainstorm for you."
+            ],
+            "actionStep": "Create 3 logo concepts for a project or personal brand."
+          },
+          {
+            "id": "aic-m3-l3",
+            "number": 3,
+            "title": "Channel Art & Product Marketing",
+            "duration": "Video",
+            "summary": "YouTube banners and ad creatives without freelancers.",
+            "content": [
+              "Replace days of design stress with AI channel art workflows.",
+              "Build Facebook and Google ad images with prompt architecture.",
+              "Launch campaigns with pro visuals at minimal cost."
+            ],
+            "actionStep": "Design one channel banner or product ad image with AI."
+          }
+        ]
+      },
+      {
+        "id": "aic-m4",
+        "number": 4,
+        "title": "AI Thumbnail Engineer",
+        "icon": "🖼️",
+        "outcome": "Thumbnails that get clicks",
+        "lessons": [
+          {
+            "id": "aic-m4-l1",
+            "number": 1,
+            "title": "Spectacular AI Thumbnails",
+            "duration": "Video",
+            "summary": "Create impossible thumbnails that still feel authentic.",
+            "content": [
+              "No shark tanks, knight armor, or plane tickets required.",
+              "Remove creative limits that blocked your best ideas.",
+              "Learn why AI thumbnails often outperform traditional shoots."
+            ],
+            "actionStep": "Create 2 thumbnail concepts for your next upload."
+          },
+          {
+            "id": "aic-m4-l2",
+            "number": 2,
+            "title": "Thumbnail Performance & Testing",
+            "duration": "Video",
+            "summary": "Iterate on winners using AI variations fast.",
+            "content": [
+              "Test multiple thumbnails without reshooting.",
+              "Study what top creators do with AI thumbnail workflows.",
+              "Pair great thumbnails with strong titles for maximum CTR."
+            ],
+            "actionStep": "A/B plan: write 3 title + thumbnail pairs for one video."
+          }
+        ]
+      },
+      {
+        "id": "aic-m5",
+        "number": 5,
+        "title": "AI Content Planning & Scriptwriting",
+        "icon": "✍️",
+        "outcome": "A month of content in 30 minutes",
+        "lessons": [
+          {
+            "id": "aic-m5-l1",
+            "number": 1,
+            "title": "AI Content Planning",
+            "duration": "Video",
+            "summary": "Plan a month of content in under 30 minutes.",
+            "content": [
+              "Reverse-engineer what's working in your niche with AI.",
+              "Build a calendar aligned with your business goals.",
+              "Track ideas and performance with a personal AI assistant."
+            ],
+            "actionStep": "Generate a 2-week content calendar for one platform."
+          },
+          {
+            "id": "aic-m5-l2",
+            "number": 2,
+            "title": "AI Scriptwriting",
+            "duration": "Video",
+            "summary": "Full scripts for YouTube, Reels, Shorts, and TikTok.",
+            "content": [
+              "Use exact prompt templates for long and short-form scripts.",
+              "Train AI on competitors and your voice.",
+              "Structure videos that retain attention and deliver value fast."
+            ],
+            "actionStep": "Write one full short-form script using the course template."
+          }
+        ]
+      },
+      {
+        "id": "aic-m6",
+        "number": 6,
+        "title": "AI Studio & Video Editing",
+        "icon": "⚡",
+        "outcome": "Pro results without a pro studio",
+        "lessons": [
+          {
+            "id": "aic-m6-l1",
+            "number": 1,
+            "title": "AI Studio Upgrade",
+            "duration": "Video",
+            "summary": "Turn a blank wall into a full content studio with AI.",
+            "content": [
+              "Works in any editor, any camera, multiple AI tools.",
+              "Customize backgrounds every time you film.",
+              "No expensive studio build-out required."
+            ],
+            "actionStep": "Film one clip against a blank wall and apply an AI background."
+          },
+          {
+            "id": "aic-m6-l2",
+            "number": 2,
+            "title": "Best AI Editing Tools",
+            "duration": "Video",
+            "summary": "Edit podcasts in seconds, auto captions, and free time-savers.",
+            "content": [
+              "Top tools for CapCut, Premiere, DaVinci, and Final Cut.",
+              "Workflows that save hours every week.",
+              "Follow along with downloadable practice footage."
+            ],
+            "actionStep": "Run one clip through your chosen AI editing tool."
+          },
+          {
+            "id": "aic-m6-l3",
+            "number": 3,
+            "title": "AI Audio Enhancement",
+            "duration": "Video",
+            "summary": "Make cheap mics sound professional and recover bad audio.",
+            "content": [
+              "Quick fixes for any recording environment.",
+              "Restore audio you thought was ruined.",
+              "Pair clean audio with AI visuals for pro results."
+            ],
+            "actionStep": "Enhance one audio clip and compare before/after."
+          }
+        ]
+      }
+    ],
+    "bonusResources": [
+      {
+        "id": "viral-effects",
+        "title": "Viral Video Effects Course",
+        "icon": "✨"
+      },
+      {
+        "id": "templates",
+        "title": "Signature Editing Templates",
+        "icon": "🎞️"
+      },
+      {
+        "id": "prompts",
+        "title": "AI Prompt & Script Library",
+        "icon": "📋"
+      }
+    ]
+  },
+  "media": {
+    "instructorPhoto": "/course-media/ai-creator-course/images/instructor.jpg",
+    "previewVideoPoster": "/course-media/ai-creator-course/images/preview-poster.jpg"
+  }
+}
