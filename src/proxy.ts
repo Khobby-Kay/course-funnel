@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ACCESS_COOKIE, hasAccessToCourse, hasValidAccess } from "@/lib/access";
-import { ADMIN_COOKIE, verifyAdminToken } from "@/lib/admin/auth";
+import { isAdminAuthenticated } from "@/lib/admin/session";
+import { createSupabaseProxyClient } from "@/lib/supabase/proxy";
+import { isSupabaseAuthConfigured } from "@/lib/supabase/config";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -9,9 +11,19 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
     const isLogin = pathname === "/admin/login" || pathname === "/api/admin/login";
 
+    let response = NextResponse.next({ request });
+
+    if (isSupabaseAuthConfigured()) {
+      const { supabase, response: supabaseResponse } = createSupabaseProxyClient(request);
+      response = supabaseResponse;
+      if (supabase) {
+        await supabase.auth.getUser();
+      }
+    }
+
     if (!isLogin) {
-      const token = request.cookies.get(ADMIN_COOKIE)?.value;
-      if (!(await verifyAdminToken(token))) {
+      const adminCookie = request.cookies.get("admin_session")?.value;
+      if (!(await isAdminAuthenticated(adminCookie))) {
         if (pathname.startsWith("/api/admin")) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
@@ -21,7 +33,8 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(url);
       }
     }
-    return NextResponse.next();
+
+    return response;
   }
 
   if (!pathname.startsWith("/dashboard")) {

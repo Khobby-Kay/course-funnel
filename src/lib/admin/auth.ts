@@ -57,8 +57,10 @@ function timingSafeEqual(a: string, b: string): boolean {
 
 export function verifyAdminPassword(password: string): boolean {
   const expected = getPassword();
-  if (password.length !== expected.length) return false;
-  return timingSafeEqual(password, expected);
+  const a = password.trim();
+  const b = expected;
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export async function createAdminToken(): Promise<string> {

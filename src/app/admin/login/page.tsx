@@ -23,11 +23,10 @@ function AdminLoginForm({ from }: { from: string }) {
 
       if (!response.ok) {
         const data = (await response.json().catch(() => ({}))) as { error?: string };
-        const hint =
-          response.status === 401
-            ? " Wrong password, or the dev server still has an old ADMIN_PASSWORD — stop npm run dev and start it again after editing .env.local."
-            : "";
-        throw new Error((data.error ?? "Login failed") + hint);
+        throw new Error(
+          data.error ??
+            "Invalid password. Use ADMIN_PASSWORD from .env.local and restart npm run dev after changing it."
+        );
       }
 
       window.location.assign(from);
@@ -44,9 +43,7 @@ function AdminLoginForm({ from }: { from: string }) {
         className="w-full max-w-md rounded-2xl bg-white border border-black/10 shadow-xl p-8"
       >
         <h1 className="text-2xl font-bold text-black mb-1">Admin sign in</h1>
-        <p className="text-gray-muted text-sm mb-6">
-          Manage courses, media, and publishing
-        </p>
+        <p className="text-gray-muted text-sm mb-6">Manage courses, media, and publishing</p>
 
         {error && (
           <p className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm" role="alert">
@@ -61,7 +58,7 @@ function AdminLoginForm({ from }: { from: string }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter admin password"
+            placeholder="ADMIN_PASSWORD from .env.local"
             className="mt-2 w-full px-4 py-3 rounded-xl border border-black/15 bg-white text-black focus:border-purple focus:ring-2 focus:ring-purple/20 focus:outline-none"
             autoComplete="current-password"
           />
@@ -76,9 +73,9 @@ function AdminLoginForm({ from }: { from: string }) {
         </button>
 
         <p className="text-xs text-gray-muted mt-6 text-center leading-relaxed">
-          Password is <code className="font-mono text-black/80 bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in{" "}
-          <code className="font-mono text-black/80 bg-black/5 px-1 rounded">.env.local</code>.
-          After changing it, restart <code className="font-mono">npm run dev</code>.
+          Password is <code className="font-mono bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in{" "}
+          <code className="font-mono bg-black/5 px-1 rounded">.env.local</code>. Restart{" "}
+          <code className="font-mono">npm run dev</code> after you change it.
         </p>
       </form>
     </main>

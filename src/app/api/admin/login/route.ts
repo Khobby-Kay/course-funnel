@@ -25,7 +25,10 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Login failed";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Login failed. Set ADMIN_PASSWORD in .env.local (local) or Vercel env vars.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
