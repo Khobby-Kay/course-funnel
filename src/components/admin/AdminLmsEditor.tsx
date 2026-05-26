@@ -55,7 +55,7 @@ export default function AdminLmsEditor({ courseSlug, lms, onChange }: AdminLmsEd
                   field="lessonVideo"
                   lessonId={lesson.id}
                   label={lesson.videoPath ? "Replace lesson video" : "Upload lesson video"}
-                  hint="MP4 up to 500 MB · stored privately for enrolled students"
+                  hint="MP4 up to 500 MB · uploads go directly to Supabase Storage"
                   accept="video/mp4,video/webm,video/quicktime"
                   onUploaded={({ videoPath }) => {
                     if (videoPath) updateLessonVideo(lesson.id, videoPath);

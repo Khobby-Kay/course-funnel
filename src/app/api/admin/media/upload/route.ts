@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadCourseBySlug, saveCourse } from "@/lib/courses/store";
 import type { CourseMedia } from "@/lib/courses/types";
+import { lessonVideoStoragePath } from "@/lib/media/paths";
 import {
   savePrivateLessonVideo,
   savePublicMedia,
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
       }
 
       if (supabase) {
-        const storagePath = `${courseSlug}/lessons/${lessonId}${mime.includes("webm") ? ".webm" : ".mp4"}`;
+        const storagePath = lessonVideoStoragePath(courseSlug, lessonId, mime);
         const { error } = await supabase.storage
           .from(COURSE_VIDEOS_BUCKET)
           .upload(storagePath, buffer, { contentType: mime, upsert: true });

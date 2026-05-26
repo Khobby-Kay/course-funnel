@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import type { MediaUploadField } from "@/lib/media/types";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { COURSE_VIDEOS_BUCKET } from "@/lib/supabase/config";
 
 type AdminMediaUploadProps = {
   courseSlug: string;
@@ -13,6 +15,42 @@ type AdminMediaUploadProps = {
   lessonId?: string;
   onUploaded: (result: { url?: string; videoPath?: string; media?: unknown }) => void;
 };
+
+type UploadJson = {
+  error?: string;
+  url?: string;
+  videoPath?: string;
+  media?: unknown;
+  path?: string;
+  token?: string;
+  storagePath?: string;
+  bucket?: string;
+};
+
+function canDirectVideoUpload(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+  );
+}
+
+async function readUploadResponse(response: Response): Promise<{ data: UploadJson | null; text: string }> {
+  const contentType = response.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
+  if (isJson) {
+    return { data: (await response.json()) as UploadJson, text: "" };
+  }
+  return { data: null, text: await response.text() };
+}
+
+function uploadError(response: Response, data: UploadJson | null, text: string): Error {
+  if (response.status === 413) {
+    return new Error(
+      "Upload rejected: file is too large for this server route. Use direct Supabase upload (refresh and try again)."
+    );
+  }
+  return new Error(data?.error ?? (text || "Upload failed"));
+}
 
 export default function AdminMediaUpload({
   courseSlug,
@@ -28,40 +66,91 @@ export default function AdminMediaUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
+  const uploadLessonVideoDirect = async (file: File) => {
+    if (!lessonId) throw new Error("lessonId is required for lesson videos");
+
+    const mime = file.type || "application/octet-stream";
+
+    const prepareResponse = await fetch("/api/admin/media/upload-url", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        courseSlug,
+        lessonId,
+        mime,
+        size: file.size,
+      }),
+    });
+
+    const { data: prepare, text: prepareText } = await readUploadResponse(prepareResponse);
+    if (!prepareResponse.ok) throw uploadError(prepareResponse, prepare, prepareText);
+    if (!prepare?.path || !prepare.token || !prepare.storagePath) {
+      throw new Error("Upload URL response was incomplete");
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: uploadErrorResult } = await supabase.storage
+      .from(prepare.bucket ?? COURSE_VIDEOS_BUCKET)
+      .uploadToSignedUrl(prepare.path, prepare.token, file, {
+        contentType: mime,
+        upsert: true,
+      });
+
+    if (uploadErrorResult) {
+      throw new Error(uploadErrorResult.message);
+    }
+
+    const completeResponse = await fetch("/api/admin/media/complete", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        courseSlug,
+        lessonId,
+        videoPath: prepare.storagePath,
+      }),
+    });
+
+    const { data: complete, text: completeText } = await readUploadResponse(completeResponse);
+    if (!completeResponse.ok) throw uploadError(completeResponse, complete, completeText);
+
+    onUploaded({ videoPath: complete?.videoPath ?? prepare.storagePath });
+  };
+
+  const uploadViaApi = async (file: File) => {
+    const body = new FormData();
+    body.append("file", file);
+    body.append("courseSlug", courseSlug);
+    body.append("field", field);
+    if (lessonId) body.append("lessonId", lessonId);
+
+    const response = await fetch("/api/admin/media/upload", {
+      method: "POST",
+      credentials: "include",
+      body,
+    });
+
+    const { data, text } = await readUploadResponse(response);
+    if (!response.ok) throw uploadError(response, data, text);
+
+    onUploaded({
+      url: data?.url,
+      videoPath: data?.videoPath,
+      media: data?.media,
+    });
+  };
+
   const upload = async (file: File) => {
     setError("");
     setUploading(true);
 
     try {
-      const body = new FormData();
-      body.append("file", file);
-      body.append("courseSlug", courseSlug);
-      body.append("field", field);
-      if (lessonId) body.append("lessonId", lessonId);
-
-      const response = await fetch("/api/admin/media/upload", {
-        method: "POST",
-        credentials: "include",
-        body,
-      });
-
-      const contentType = response.headers.get("content-type") ?? "";
-      const isJson = contentType.includes("application/json");
-      const data = isJson ? ((await response.json()) as { error?: string; url?: string; videoPath?: string; media?: unknown }) : null;
-      const text = isJson ? "" : (await response.text());
-
-      if (!response.ok) {
-        if (response.status === 413) {
-          throw new Error("Upload rejected: file is too large for this request. Try a smaller video.");
-        }
-        throw new Error(data?.error ?? (text || "Upload failed"));
+      if (field === "lessonVideo" && canDirectVideoUpload()) {
+        await uploadLessonVideoDirect(file);
+      } else {
+        await uploadViaApi(file);
       }
-
-      onUploaded({
-        url: data?.url,
-        videoPath: data?.videoPath,
-        media: data?.media,
-      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
