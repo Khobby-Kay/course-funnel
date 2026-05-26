@@ -45,13 +45,22 @@ export default function AdminMediaUpload({
         body,
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Upload failed");
+      const contentType = response.headers.get("content-type") ?? "";
+      const isJson = contentType.includes("application/json");
+      const data = isJson ? ((await response.json()) as { error?: string; url?: string; videoPath?: string; media?: unknown }) : null;
+      const text = isJson ? "" : (await response.text());
+
+      if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error("Upload rejected: file is too large for this request. Try a smaller video.");
+        }
+        throw new Error(data?.error ?? text || "Upload failed");
+      }
 
       onUploaded({
-        url: data.url as string | undefined,
-        videoPath: data.videoPath as string | undefined,
-        media: data.media,
+        url: data?.url,
+        videoPath: data?.videoPath,
+        media: data?.media,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
