@@ -30,6 +30,7 @@ function SuccessContent() {
   const reference = resolvePaymentReference(searchParams);
   const provider = searchParams.get("provider") as PaymentProvider | "demo" | null;
   const courseFromUrl = searchParams.get("course")?.trim() || "";
+  const momoPrompt = searchParams.get("momo") === "1";
 
   const [grantedCourseSlug, setGrantedCourseSlug] = useState<string | null>(null);
   const [confirmationEmailSent, setConfirmationEmailSent] = useState(false);
@@ -112,9 +113,15 @@ function SuccessContent() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center px-4">
-        <p className="text-white/70">Confirming your payment and unlocking your course…</p>
-        <p className="text-white/40 text-sm mt-2">MoMo payments can take a few seconds to confirm.</p>
+      <main className="min-h-screen bg-black flex items-center justify-center px-4 text-center max-w-md mx-auto">
+        <p className="text-white/70">
+          {momoPrompt
+            ? "Approve the Mobile Money prompt on your phone, then wait while we confirm…"
+            : "Confirming your payment and unlocking your course…"}
+        </p>
+        <p className="text-white/40 text-sm mt-2">
+          MoMo payments can take a few seconds after you enter your PIN.
+        </p>
       </main>
     );
   }

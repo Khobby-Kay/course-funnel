@@ -39,6 +39,17 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
         throw new Error(result.error ?? "Could not start payment");
       }
 
+      if (result.momoPrompt || !result.checkoutUrl) {
+        const params = new URLSearchParams({
+          reference: String(result.reference),
+          provider: "moolre",
+          course: data.slug,
+          momo: "1",
+        });
+        window.location.href = `/success?${params.toString()}`;
+        return;
+      }
+
       window.location.href = result.checkoutUrl as string;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
@@ -183,7 +194,9 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
             </section>
 
             <Button type="submit" size="lg" className="w-full mb-4" disabled={isSubmitting}>
-              {isSubmitting ? "Redirecting to Moolre…" : `Pay ${course.currency} ${course.price} with MoMo →`}
+              {isSubmitting
+                ? "Sending MoMo prompt to your phone…"
+                : `Pay ${course.currency} ${course.price} with MoMo →`}
             </Button>
 
             <p className="text-center text-xs text-gray-muted mb-4">

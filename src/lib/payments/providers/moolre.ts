@@ -5,15 +5,22 @@ import {
   parseMoolreCourseSlug,
   type MoolreStatusPayload,
 } from "../moolre-status";
+import { isMoolrePromptSent, moolreErrorMessage } from "../moolre-errors";
+import { moolreNetworkLabel, normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone } from "../moolre-phone";
 import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
 
-type MoolreLinkResponse = {
-  status: number;
+type MoolreApiResponse = {
+  status: number | string;
   code?: string;
   message?: string;
   data?: {
-    authorization_url: string;
-    reference: string;
+    authorization_url?: string;
+    reference?: string;
+    externalref?: string;
+    txstatus?: number | string;
+    amount?: number | string;
+    currency?: string;
+    metadata?: Record<string, unknown>;
   };
 };
 
@@ -36,6 +43,10 @@ function getMoolreHeaders(): Record<string, string> {
   return headers;
 }
 
+function useDirectMomoFlow(): boolean {
+  return process.env.MOOLRE_PAYMENT_MODE?.trim().toLowerCase() !== "link";
+}
+
 export async function initializeMoolre(
   input: InitializePaymentInput,
   pricing: CoursePricing
@@ -49,39 +60,124 @@ export async function initializeMoolre(
 
   const reference = createPaymentReference("moolre", pricing.slug);
   const appUrl = getAppUrl();
+  const redirect = `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}&momo=1`;
 
+  if (useDirectMomoFlow()) {
+    return initializeMoolreDirectMomo({
+      input,
+      pricing,
+      reference,
+      accountNumber,
+      redirect,
+      appUrl,
+    });
+  }
+
+  return initializeMoolreHostedLink({
+    input,
+    pricing,
+    reference,
+    accountNumber,
+    redirect,
+    appUrl,
+  });
+}
+
+async function initializeMoolreDirectMomo(params: {
+  input: InitializePaymentInput;
+  pricing: CoursePricing;
+  reference: string;
+  accountNumber: string;
+  redirect: string;
+  appUrl: string;
+}): Promise<InitializePaymentResult> {
+  const payer = normalizeGhanaMoMoPhone(params.input.phone);
+  const channel = resolveMoolreChannelFromPhone(payer);
+
+  const response = await fetch(`${getMoolreBaseUrl()}/open/transact/payment`, {
+    method: "POST",
+    headers: getMoolreHeaders(),
+    body: JSON.stringify({
+      type: 1,
+      amount: String(params.pricing.price),
+      email: params.input.email,
+      externalref: params.reference,
+      callback: `${params.appUrl}/api/webhooks/moolre`,
+      redirect: params.redirect,
+      currency: params.pricing.currency,
+      accountnumber: params.accountNumber,
+      payer,
+      channel,
+      metadata: {
+        name: params.input.name,
+        phone: payer,
+        course: params.pricing.title,
+        course_slug: params.pricing.slug,
+        network: moolreNetworkLabel(payer),
+      },
+    }),
+  });
+
+  const payload = (await response.json()) as MoolreApiResponse;
+
+  if (!isMoolrePromptSent(payload)) {
+    const msg = moolreErrorMessage(
+      payload.code,
+      payload.message || "Could not send Mobile Money prompt. Please try again."
+    );
+    throw new Error(msg);
+  }
+
+  return {
+    reference: params.reference,
+    provider: "moolre",
+    momoPrompt: true,
+  };
+}
+
+/** Legacy hosted POS link — requires customer login on pos.moolre.com; avoid in production. */
+async function initializeMoolreHostedLink(params: {
+  input: InitializePaymentInput;
+  pricing: CoursePricing;
+  reference: string;
+  accountNumber: string;
+  redirect: string;
+  appUrl: string;
+}): Promise<InitializePaymentResult> {
   const response = await fetch(`${getMoolreBaseUrl()}/embed/link`, {
     method: "POST",
     headers: getMoolreHeaders(),
     body: JSON.stringify({
       type: 1,
-      amount: String(pricing.price),
-      email: input.email,
-      externalref: reference,
-      callback: `${appUrl}/api/webhooks/moolre`,
-      redirect: `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}`,
+      amount: String(params.pricing.price),
+      email: params.input.email,
+      externalref: params.reference,
+      callback: `${params.appUrl}/api/webhooks/moolre`,
+      redirect: params.redirect,
       reusable: "0",
-      currency: pricing.currency,
-      accountnumber: accountNumber,
+      currency: params.pricing.currency,
+      accountnumber: params.accountNumber,
       metadata: {
-        name: input.name,
-        phone: input.phone,
-        course: pricing.title,
-        course_slug: pricing.slug,
+        name: params.input.name,
+        phone: params.input.phone,
+        course: params.pricing.title,
+        course_slug: params.pricing.slug,
       },
     }),
   });
 
-  const payload = (await response.json()) as MoolreLinkResponse;
+  const payload = (await response.json()) as MoolreApiResponse;
   const checkoutUrl = payload.data?.authorization_url;
 
-  if (!response.ok || payload.status !== 1 || !checkoutUrl) {
-    throw new Error(payload.message || "Moolre payment link generation failed");
+  if (!response.ok || Number(payload.status) !== 1 || !checkoutUrl) {
+    throw new Error(
+      moolreErrorMessage(payload.code, payload.message || "Moolre payment link generation failed")
+    );
   }
 
   return {
     checkoutUrl,
-    reference,
+    reference: params.reference,
     provider: "moolre",
   };
 }

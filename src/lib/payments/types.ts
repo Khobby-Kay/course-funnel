@@ -16,9 +16,12 @@ export type CoursePricing = {
 };
 
 export type InitializePaymentResult = {
-  checkoutUrl: string;
+  /** Hosted checkout URL (Paystack/Flutterwave). Omitted for direct MoMo prompt. */
+  checkoutUrl?: string;
   reference: string;
   provider: PaymentProvider;
+  /** Customer approves payment on their phone — no third-party login page. */
+  momoPrompt?: boolean;
 };
 
 export type VerifyPaymentResult = {
