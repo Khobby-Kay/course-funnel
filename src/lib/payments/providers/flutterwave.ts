@@ -70,10 +70,14 @@ export async function verifyFlutterwave(reference: string) {
   const payload = await response.json();
   const data = payload?.data;
 
+  const courseSlug =
+    typeof data?.meta?.course_slug === "string" ? data.meta.course_slug.trim() : undefined;
+
   return {
     success: payload?.status === "success" && data?.status === "successful",
     reference,
     provider: "flutterwave" as const,
+    courseSlug: courseSlug || undefined,
     amount: typeof data?.amount === "number" ? data.amount : undefined,
     currency: data?.currency,
     customerEmail: data?.customer?.email,

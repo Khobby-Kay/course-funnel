@@ -69,10 +69,19 @@ export async function verifyPaystack(reference: string) {
   const payload = await response.json();
   const data = payload?.data;
 
+  const meta = data?.metadata;
+  const courseSlug =
+    (typeof meta?.course_slug === "string" ? meta.course_slug.trim() : undefined) ||
+    meta?.custom_fields?.find(
+      (item: { variable_name?: string; value?: string }) =>
+        item.variable_name === "course_slug" && typeof item.value === "string"
+    )?.value?.trim();
+
   return {
     success: payload?.status === true && data?.status === "success",
     reference,
     provider: "paystack" as const,
+    courseSlug: courseSlug || undefined,
     amount: typeof data?.amount === "number" ? data.amount / 100 : undefined,
     currency: data?.currency,
     customerEmail: data?.customer?.email,

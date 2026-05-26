@@ -108,9 +108,9 @@ export const CHECKOUT_INCLUDED = [
 
 export const PAYMENT_OPTIONS = [
   { id: "moolre" as const, label: "Mobile Money", hint: "MTN · Telecel · AT" },
-  { id: "paystack" as const, label: "Paystack", hint: "MoMo & bank" },
-  { id: "flutterwave" as const, label: "Flutterwave", hint: "Cards & MoMo" },
-  { id: "card" as const, label: "Visa / Mastercard", hint: "Via Paystack" },
+  { id: "paystack" as const, label: "Mobile Money & Bank", hint: "All major networks" },
+  { id: "flutterwave" as const, label: "Card & Mobile Money", hint: "Local & international" },
+  { id: "card" as const, label: "Visa / Mastercard", hint: "Debit or credit card" },
 ];
 
 /** @deprecated Use PAYMENT_OPTIONS */
@@ -212,7 +212,7 @@ export const FAQ_ITEMS = [
   {
     question: "Is payment secure?",
     answer:
-      "Yes. Payments run through Moolre (Mobile Money), Paystack, and Flutterwave — the same platforms used by major African businesses. SSL encrypted end-to-end.",
+      "Yes. Checkout uses encrypted, industry-standard payment processing. Mobile Money, bank transfer, and card options are available. SSL protected end-to-end.",
   },
 ];
 

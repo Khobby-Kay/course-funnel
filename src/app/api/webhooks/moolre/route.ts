@@ -1,19 +1,24 @@
 import { NextResponse } from "next/server";
 import { recordConfirmedPayment } from "@/lib/payments/confirmed-store";
 import type { PaymentProvider } from "@/lib/payments/types";
+import { parseCourseSlugFromReference } from "@/lib/payments/utils";
 
 type MoolreWebhook = {
   status?: number | string;
+  code?: string;
+  message?: string;
   data?: {
-    status?: string;
+    txstatus?: number;
     externalref?: string;
     metadata?: {
       course_slug?: string;
+      courseSlug?: string;
     };
   };
   externalref?: string;
   metadata?: {
     course_slug?: string;
+    courseSlug?: string;
   };
 };
 
@@ -26,12 +31,13 @@ export async function POST(request: Request) {
   }
 
   const reference = payload.data?.externalref ?? payload.externalref;
+  const meta = payload.data?.metadata ?? payload.metadata;
   const courseSlug =
-    payload.data?.metadata?.course_slug?.trim() ?? payload.metadata?.course_slug?.trim();
-  const paid =
-    payload.status === 1 ||
-    payload.data?.status === "success" ||
-    payload.data?.status === "successful";
+    (typeof meta?.course_slug === "string" ? meta.course_slug.trim() : undefined) ||
+    (typeof meta?.courseSlug === "string" ? meta.courseSlug.trim() : undefined) ||
+    (reference ? parseCourseSlugFromReference(reference) : null) ||
+    undefined;
+  const paid = payload.status === 1 || payload.data?.txstatus === 1;
 
   if (paid && reference && courseSlug) {
     recordConfirmedPayment({

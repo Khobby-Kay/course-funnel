@@ -41,6 +41,9 @@ yarn-error.log*
 # uploaded course media (private lesson videos)
 /data/course-media/
 
+# payment state (pending + confirmed; server-local)
+/data/payments/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -4,6 +4,7 @@ import type { CoursePricing } from "./types";
 import { initializeFlutterwave, verifyFlutterwave } from "./providers/flutterwave";
 import { initializeMoolre, verifyMoolre } from "./providers/moolre";
 import { initializePaystack, verifyPaystack } from "./providers/paystack";
+import { recordPendingPayment } from "./pending-store";
 import { getAppUrl, isDemoMode } from "./utils";
 
 export function resolveCoursePricing(courseSlug: string): CoursePricing {
@@ -24,7 +25,13 @@ export async function initializePayment(
   const pricing = resolveCoursePricing(input.courseSlug);
 
   if (isDemoMode()) {
-    const reference = `demo-${Date.now()}`;
+    const reference = `cf-${input.courseSlug.replace(/[^a-z0-9-]/gi, "-").replace(/-+/g, "-").toLowerCase()}-demo-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    recordPendingPayment({
+      reference,
+      courseSlug: input.courseSlug,
+      provider: "demo",
+      createdAt: Date.now(),
+    });
     return {
       checkoutUrl: `${getAppUrl()}/success?reference=${reference}&provider=demo&demo=1&course=${input.courseSlug}`,
       reference,
@@ -32,17 +39,30 @@ export async function initializePayment(
     };
   }
 
+  let result: InitializePaymentResult;
   switch (input.provider) {
     case "moolre":
-      return initializeMoolre(input, pricing);
+      result = await initializeMoolre(input, pricing);
+      break;
     case "flutterwave":
-      return initializeFlutterwave(input, pricing);
+      result = await initializeFlutterwave(input, pricing);
+      break;
     case "card":
-      return initializePaystack(input, pricing, ["card"]);
+      result = await initializePaystack(input, pricing, ["card"]);
+      break;
     case "paystack":
     default:
-      return initializePaystack(input, pricing);
+      result = await initializePaystack(input, pricing);
   }
+
+  recordPendingPayment({
+    reference: result.reference,
+    courseSlug: input.courseSlug,
+    provider: result.provider,
+    createdAt: Date.now(),
+  });
+
+  return result;
 }
 
 export async function verifyPayment(

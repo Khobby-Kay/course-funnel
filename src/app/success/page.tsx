@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
-import { courseCheckoutPath, courseDashboardPath, FALLBACK_COURSE_SLUG } from "@/lib/courses";
+import { courseCheckoutPath, courseDashboardPath } from "@/lib/courses";
 import type { PaymentProvider } from "@/lib/payments/types";
 import { siteConfig } from "@/lib/site-config";
 
@@ -16,24 +16,35 @@ function resolvePaymentReference(searchParams: URLSearchParams): string | null {
   );
 }
 
+type GrantResponse = {
+  ok?: boolean;
+  courseSlug?: string;
+  dashboardPath?: string;
+  error?: string;
+};
+
 function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reference = resolvePaymentReference(searchParams);
   const provider = searchParams.get("provider") as PaymentProvider | "demo" | null;
-  const courseSlug = searchParams.get("course") ?? FALLBACK_COURSE_SLUG;
+  const courseFromUrl = searchParams.get("course")?.trim() || "";
 
-  const dashboardHref = courseDashboardPath(courseSlug);
-  const checkoutHref = courseCheckoutPath(courseSlug);
-
-  const canGrant = Boolean(reference && provider && courseSlug);
+  const [grantedCourseSlug, setGrantedCourseSlug] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "success" | "failed">(
-    canGrant ? "loading" : "failed"
+    reference && provider ? "loading" : "failed"
   );
   const redirected = useRef(false);
 
+  const dashboardHref = grantedCourseSlug
+    ? courseDashboardPath(grantedCourseSlug)
+    : courseFromUrl
+      ? courseDashboardPath(courseFromUrl)
+      : "/dashboard";
+  const checkoutHref = courseFromUrl ? courseCheckoutPath(courseFromUrl) : "/";
+
   useEffect(() => {
-    if (!canGrant || !reference || !provider) return;
+    if (!reference || !provider) return;
 
     const grantAccess = async () => {
       try {
@@ -41,29 +52,44 @@ function SuccessContent() {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reference, provider, courseSlug }),
+          body: JSON.stringify({
+            reference,
+            provider,
+            courseSlug: courseFromUrl || undefined,
+          }),
         });
 
-        setStatus(grantRes.ok ? "success" : "failed");
+        const data = (await grantRes.json().catch(() => ({}))) as GrantResponse;
+
+        if (!grantRes.ok || !data.courseSlug) {
+          setStatus("failed");
+          return;
+        }
+
+        setGrantedCourseSlug(data.courseSlug);
+        setStatus("success");
       } catch {
         setStatus("failed");
       }
     };
 
     grantAccess();
-  }, [canGrant, reference, provider, courseSlug]);
+  }, [reference, provider, courseFromUrl]);
 
   useEffect(() => {
-    if (status !== "success" || redirected.current) return;
+    if (status !== "success" || !grantedCourseSlug || redirected.current) return;
+
+    const path = courseDashboardPath(grantedCourseSlug);
+
     if (siteConfig.successRedirectSeconds <= 0) return;
 
     const timer = setTimeout(() => {
       redirected.current = true;
-      router.push(dashboardHref);
+      router.replace(path);
     }, siteConfig.successRedirectSeconds * 1000);
 
     return () => clearTimeout(timer);
-  }, [status, router, dashboardHref]);
+  }, [status, grantedCourseSlug, router]);
 
   if (status === "loading") {
     return (
@@ -101,23 +127,23 @@ function SuccessContent() {
           🎉
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Payment Successful</h1>
-        <p className="text-white/70 text-lg mb-2">Welcome to the course. Your access has been granted.</p>
+        <p className="text-white/70 text-lg mb-2">Your course is ready — open it below to start watching.</p>
         {reference && <p className="text-white/40 text-sm mb-8 font-mono">Ref: {reference}</p>}
 
         <section className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
           <Button href={dashboardHref} size="lg">
-            Access Course Dashboard
+            Start Watching Course
           </Button>
           <Button variant="secondary" size="lg" disabled ariaLabel="Receipt download coming soon">
             Download Receipt
           </Button>
         </section>
 
-        {siteConfig.successRedirectSeconds > 0 && (
+        {siteConfig.successRedirectSeconds > 0 && grantedCourseSlug && (
           <p className="text-white/50 text-sm">
-            Redirecting in {siteConfig.successRedirectSeconds} seconds…{" "}
+            Opening your course in {siteConfig.successRedirectSeconds} seconds…{" "}
             <Link href={dashboardHref} className="text-gold hover:underline">
-              Go now
+              Open now
             </Link>
           </p>
         )}
@@ -131,7 +157,7 @@ export default function SuccessPage() {
     <Suspense
       fallback={
         <main className="min-h-screen bg-black flex items-center justify-center">
-          <p className="text-white/70">Loading…</p>
+          <p className="text-white/70">Confirming your payment…</p>
         </main>
       }
     >

@@ -37,7 +37,7 @@ const WHY_US = [
   },
 ] as const;
 
-const PAYMENT_BADGES = ["Mobile Money", "Paystack", "Flutterwave", "Visa / MC"];
+const PAYMENT_BADGES = ["Mobile Money", "Bank Transfer", "Card", "Visa / Mastercard"];
 
 export default async function CourseCatalog() {
   const courses = await getPublishedCourses();

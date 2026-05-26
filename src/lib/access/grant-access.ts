@@ -9,13 +9,14 @@ import {
 import { getCourseBySlug } from "@/lib/courses/server";
 import { getConfirmedPayment, recordConfirmedPayment } from "@/lib/payments/confirmed-store";
 import { verifyPayment } from "@/lib/payments";
+import { getPendingPayment } from "@/lib/payments/pending-store";
 import type { PaymentProvider } from "@/lib/payments/types";
-import { isDemoMode } from "@/lib/payments/utils";
+import { isDemoMode, parseCourseSlugFromReference } from "@/lib/payments/utils";
 
 export type GrantAccessInput = {
   reference: string;
   provider: PaymentProvider | "demo";
-  courseSlug: string;
+  courseSlug?: string;
   existingToken?: string;
 };
 
@@ -24,7 +25,34 @@ export type GrantAccessResult =
   | { ok: false; status: number; error: string };
 
 function isDemoPayment(reference: string, provider: string): boolean {
-  return provider === "demo" || reference.startsWith("demo-");
+  return provider === "demo" || reference.includes("-demo-");
+}
+
+/** Resolve which course this payment belongs to (source of truth for dashboard redirect). */
+export async function resolveCourseSlugForPayment(
+  reference: string,
+  provider: PaymentProvider | "demo",
+  requestedSlug?: string
+): Promise<string | null> {
+  const confirmed = getConfirmedPayment(reference);
+  if (confirmed?.courseSlug) return confirmed.courseSlug;
+
+  const pending = getPendingPayment(reference);
+  if (pending?.courseSlug) return pending.courseSlug;
+
+  const fromReference = parseCourseSlugFromReference(reference);
+  if (fromReference) return fromReference;
+
+  if (isDemoPayment(reference, provider)) {
+    return requestedSlug?.trim() || null;
+  }
+
+  if (!isDemoMode()) {
+    const verified = await verifyPayment(reference, provider);
+    if (verified.courseSlug) return verified.courseSlug;
+  }
+
+  return requestedSlug?.trim() || null;
 }
 
 export async function confirmPayment(
@@ -35,12 +63,18 @@ export async function confirmPayment(
   if (isDemoPayment(reference, provider)) return true;
 
   const stored = getConfirmedPayment(reference);
-  if (stored?.courseSlug === courseSlug) return true;
+  if (stored) {
+    return stored.courseSlug === courseSlug;
+  }
 
   if (isDemoMode()) return true;
 
   const verified = await verifyPayment(reference, provider);
   if (!verified.success) return false;
+
+  if (verified.courseSlug && verified.courseSlug !== courseSlug) {
+    return false;
+  }
 
   recordConfirmedPayment({
     reference,
@@ -55,10 +89,24 @@ export async function confirmPayment(
 export async function grantAccessAfterPayment(
   input: GrantAccessInput
 ): Promise<GrantAccessResult> {
-  const { reference, provider, courseSlug, existingToken } = input;
+  const { reference, provider, existingToken } = input;
 
-  if (!reference || !provider || !courseSlug) {
-    return { ok: false, status: 400, error: "Missing payment reference or course" };
+  if (!reference || !provider) {
+    return { ok: false, status: 400, error: "Missing payment reference" };
+  }
+
+  const courseSlug = await resolveCourseSlugForPayment(
+    reference,
+    provider,
+    input.courseSlug
+  );
+
+  if (!courseSlug) {
+    return {
+      ok: false,
+      status: 400,
+      error: "Could not determine which course this payment is for",
+    };
   }
 
   const course = await getCourseBySlug(courseSlug);
@@ -83,6 +131,13 @@ export async function grantAccessAfterPayment(
   };
 
   const token = await createAccessToken(existing, entitlement);
+
+  recordConfirmedPayment({
+    reference,
+    provider,
+    courseSlug,
+    confirmedAt: Date.now(),
+  });
 
   return { ok: true, token, reference, courseSlug };
 }

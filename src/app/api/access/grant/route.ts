@@ -15,15 +15,15 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Body;
     const { reference, provider, courseSlug } = body;
 
-    if (!reference || !provider || !courseSlug) {
-      return NextResponse.json({ error: "Missing payment reference or course" }, { status: 400 });
+    if (!reference || !provider) {
+      return NextResponse.json({ error: "Missing payment reference" }, { status: 400 });
     }
 
     const cookieStore = await cookies();
     const result = await grantAccessAfterPayment({
       reference,
       provider,
-      courseSlug,
+      courseSlug: courseSlug?.trim(),
       existingToken: cookieStore.get(ACCESS_COOKIE)?.value,
     });
 
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       ok: true,
       reference: result.reference,
       courseSlug: result.courseSlug,
+      dashboardPath: `/dashboard/${result.courseSlug}`,
     });
 
     response.cookies.set(ACCESS_COOKIE, result.token, {

@@ -75,7 +75,8 @@ export async function initializeMoolre(
 
   return {
     checkoutUrl,
-    reference: payload.data?.reference ?? reference,
+    // Keep our externalref — matches redirect URL and Payment Status id (idtype=1)
+    reference,
     provider: "moolre",
   };
 }
@@ -89,18 +90,27 @@ export async function verifyMoolre(reference: string) {
     headers: getMoolreHeaders(),
     body: JSON.stringify({
       type: 1,
-      externalref: reference,
+      idtype: 1,
+      id: reference,
       accountnumber: process.env.MOOLRE_ACCOUNT_NUMBER,
     }),
   });
 
   const payload = await response.json();
-  const paid = payload?.status === 1 || payload?.data?.status === "success";
+  const paid = payload?.status === 1 && payload?.data?.txstatus === 1;
+  const meta = payload?.data?.metadata ?? payload?.metadata;
+  const courseSlug =
+    typeof meta?.course_slug === "string"
+      ? meta.course_slug.trim()
+      : typeof meta?.courseSlug === "string"
+        ? meta.courseSlug.trim()
+        : undefined;
 
   return {
     success: Boolean(paid),
     reference,
     provider: "moolre" as const,
+    courseSlug: courseSlug || undefined,
     amount: undefined,
     currency: undefined,
     customerEmail: undefined,

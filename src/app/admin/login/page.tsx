@@ -27,11 +27,15 @@ export default function AdminLoginPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error ?? "Login failed");
+        const data = (await response.json().catch(() => ({}))) as { error?: string };
+        const hint =
+          response.status === 401
+            ? " Wrong password, or the dev server still has an old ADMIN_PASSWORD — stop npm run dev and start it again after editing .env.local."
+            : "";
+        throw new Error((data.error ?? "Login failed") + hint);
       }
 
-      window.location.href = from;
+      window.location.assign(from);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
@@ -77,12 +81,9 @@ export default function AdminLoginPage() {
         </button>
 
         <p className="text-xs text-gray-muted mt-6 text-center leading-relaxed">
-          Default dev password is in{" "}
-          <code className="font-mono text-black/80 bg-black/5 px-1 rounded">.env.local</code>
-          {" "}
-          as <code className="font-mono text-black/80 bg-black/5 px-1 rounded">ADMIN_PASSWORD</code>
-          {" "}
-          (often <code className="font-mono">admin123</code>)
+          Password is <code className="font-mono text-black/80 bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in{" "}
+          <code className="font-mono text-black/80 bg-black/5 px-1 rounded">.env.local</code>.
+          After changing it, restart <code className="font-mono">npm run dev</code>.
         </p>
       </form>
     </main>

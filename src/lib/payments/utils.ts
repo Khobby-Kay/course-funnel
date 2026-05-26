@@ -1,10 +1,19 @@
 import type { PaymentProvider } from "./types";
 
-export function createPaymentReference(provider: PaymentProvider, courseSlug: string): string {
-  const prefix = courseSlug.replace(/[^a-z0-9]/gi, "").slice(0, 6) || "course";
+const REF_PROVIDERS = "moolre|paystack|flutterwave|card|demo";
+
+/** Embeds course slug in the reference so grant can resolve the right dashboard. */
+export function createPaymentReference(provider: PaymentProvider | "demo", courseSlug: string): string {
+  const safeSlug = courseSlug.replace(/[^a-z0-9-]/gi, "-").replace(/-+/g, "-").toLowerCase();
   const stamp = Date.now().toString(36);
   const random = Math.random().toString(36).slice(2, 8);
-  return `${prefix}-${provider}-${stamp}-${random}`.toLowerCase();
+  return `cf-${safeSlug}-${provider}-${stamp}-${random}`;
+}
+
+/** Parse course slug from references created by createPaymentReference. */
+export function parseCourseSlugFromReference(reference: string): string | null {
+  const match = reference.match(new RegExp(`^cf-(.+)-(${REF_PROVIDERS})-[a-z0-9]+-[a-z0-9]+$`, "i"));
+  return match?.[1]?.toLowerCase() ?? null;
 }
 
 export function getAppUrl(): string {

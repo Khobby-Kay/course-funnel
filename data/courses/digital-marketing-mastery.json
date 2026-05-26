@@ -223,7 +223,7 @@
       },
       {
         "question": "Is payment secure?",
-        "answer": "Yes. Payments run through Moolre (Mobile Money), Paystack, and Flutterwave — the same platforms used by major African businesses. SSL encrypted end-to-end."
+        "answer": "Yes. Checkout uses encrypted, industry-standard payment processing. Mobile Money, bank transfer, and card options are available. SSL protected end-to-end."
       }
     ],
     "audience": [

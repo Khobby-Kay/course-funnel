@@ -25,6 +25,7 @@ export type VerifyPaymentResult = {
   success: boolean;
   reference: string;
   provider: PaymentProvider;
+  courseSlug?: string;
   amount?: number;
   currency?: string;
   customerEmail?: string;
