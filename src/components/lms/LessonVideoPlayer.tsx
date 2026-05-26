@@ -11,6 +11,11 @@ type LessonVideoPlayerProps = {
   theme?: "dark" | "light";
 };
 
+type VideoWithWebkit = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitDisplayingFullscreen?: boolean;
+};
+
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
   const m = Math.floor(seconds / 60);
@@ -43,7 +48,7 @@ export default function LessonVideoPlayer({
     if (hideTimer.current) clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => {
       if (videoRef.current && !videoRef.current.paused) setShowControls(false);
-    }, 3000);
+    }, 3500);
   }, []);
 
   useEffect(() => {
@@ -134,8 +139,16 @@ export default function LessonVideoPlayer({
   };
 
   const toggleFullscreen = async () => {
+    const video = videoRef.current as VideoWithWebkit | null;
     const container = containerRef.current;
-    if (!container) return;
+    if (!video || !container) return;
+
+    if (video.webkitEnterFullscreen && !document.fullscreenElement) {
+      video.webkitEnterFullscreen();
+      resetHideTimer();
+      return;
+    }
+
     if (document.fullscreenElement) {
       await document.exitFullscreen();
     } else {
@@ -146,21 +159,23 @@ export default function LessonVideoPlayer({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  const barBg = isDark ? "bg-white/20" : "bg-black/15";
-  const barFill = isDark ? "bg-gold" : "bg-purple";
-  const panelBg = isDark ? "bg-gradient-to-t from-black/90 via-black/60 to-transparent" : "bg-gradient-to-t from-black/80 via-black/50 to-transparent";
-  const btnClass = isDark
-    ? "p-2 rounded-lg hover:bg-white/10 text-white transition-colors"
-    : "p-2 rounded-lg hover:bg-white/20 text-white transition-colors";
+  const panelBg = isDark
+    ? "bg-gradient-to-t from-black/95 via-black/70 to-transparent"
+    : "bg-gradient-to-t from-black/85 via-black/55 to-transparent";
+  const btnClass =
+    "min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-white transition-colors touch-manipulation " +
+    (isDark ? "active:bg-white/20 sm:hover:bg-white/10" : "active:bg-white/25 sm:hover:bg-white/20");
 
   return (
     <div
       ref={containerRef}
-      className={`relative aspect-video rounded-2xl overflow-hidden bg-black border ${
-        isDark ? "border-white/10 shadow-2xl" : "border-black/10 shadow-lg"
-      } group`}
+      className={`relative w-full max-w-full aspect-video rounded-none sm:rounded-2xl overflow-hidden bg-black border-y sm:border ${
+        isDark ? "border-white/10 sm:shadow-2xl" : "border-black/10 sm:shadow-lg"
+      } group touch-manipulation`}
       onMouseMove={resetHideTimer}
       onMouseLeave={() => playing && setShowControls(false)}
+      onTouchStart={resetHideTimer}
+      onTouchEnd={resetHideTimer}
     >
       <video
         ref={videoRef}
@@ -170,7 +185,7 @@ export default function LessonVideoPlayer({
         poster={poster}
         playsInline
         preload="metadata"
-        className="w-full h-full object-contain bg-black"
+        className="absolute inset-0 w-full h-full object-contain bg-black"
         onClick={togglePlay}
         onContextMenu={(e) => e.preventDefault()}
       />
@@ -184,14 +199,14 @@ export default function LessonVideoPlayer({
         aria-label={playing ? "Pause" : "Play"}
       >
         {!playing && (
-          <span className="w-16 h-16 rounded-full bg-black/50 border border-white/30 flex items-center justify-center text-white text-2xl backdrop-blur-sm">
+          <span className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/50 border border-white/30 flex items-center justify-center text-white text-xl sm:text-2xl backdrop-blur-sm">
             ▶
           </span>
         )}
       </button>
 
       <div
-        className={`absolute inset-x-0 bottom-0 ${panelBg} px-3 pt-8 pb-3 transition-opacity duration-300 ${
+        className={`absolute inset-x-0 bottom-0 ${panelBg} px-2 sm:px-3 pt-6 sm:pt-8 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:pb-3 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -202,30 +217,46 @@ export default function LessonVideoPlayer({
           step={0.1}
           value={currentTime}
           onChange={(e) => seek(Number(e.target.value))}
-          className={`w-full h-1.5 mb-3 appearance-none cursor-pointer rounded-full ${barBg}`}
+          className="w-full h-2 sm:h-1.5 mb-2 sm:mb-3 appearance-none cursor-pointer rounded-full bg-white/20 touch-manipulation"
           style={{
-            background: `linear-gradient(to right, ${isDark ? "#D4AF37" : "#7C3AED"} ${progress}%, ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)"} ${progress}%)`,
+            background: `linear-gradient(to right, ${isDark ? "#D4AF37" : "#7C3AED"} ${progress}%, rgba(255,255,255,0.2) ${progress}%)`,
           }}
           aria-label="Seek"
         />
 
-        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-0.5 sm:gap-2 min-w-0">
           <button type="button" onClick={togglePlay} className={btnClass} aria-label={playing ? "Pause" : "Play"}>
-            {playing ? "⏸" : "▶"}
+            <span className="text-base sm:text-lg">{playing ? "⏸" : "▶"}</span>
           </button>
-          <button type="button" onClick={() => skip(-10)} className={btnClass} aria-label="Back 10 seconds">
+
+          <button
+            type="button"
+            onClick={() => skip(-10)}
+            className={`${btnClass} hidden sm:flex text-xs font-medium px-1 sm:px-2`}
+            aria-label="Back 10 seconds"
+          >
             −10s
           </button>
-          <button type="button" onClick={() => skip(10)} className={btnClass} aria-label="Forward 10 seconds">
+          <button
+            type="button"
+            onClick={() => skip(10)}
+            className={`${btnClass} hidden sm:flex text-xs font-medium px-1 sm:px-2`}
+            aria-label="Forward 10 seconds"
+          >
             +10s
           </button>
 
-          <span className="text-xs text-white/80 tabular-nums min-w-[80px]">
+          <span className="text-[11px] sm:text-xs text-white/80 tabular-nums shrink-0 px-1">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
 
-          <div className="flex items-center gap-1 ml-auto">
-            <button type="button" onClick={toggleMute} className={btnClass} aria-label={muted ? "Unmute" : "Mute"}>
+          <div className="flex items-center gap-0.5 sm:gap-1 ml-auto shrink-0">
+            <button
+              type="button"
+              onClick={toggleMute}
+              className={`${btnClass} hidden sm:flex`}
+              aria-label={muted ? "Unmute" : "Mute"}
+            >
               {muted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
             </button>
             <input
@@ -235,14 +266,14 @@ export default function LessonVideoPlayer({
               step={0.05}
               value={muted ? 0 : volume}
               onChange={(e) => changeVolume(Number(e.target.value))}
-              className="w-16 sm:w-20 h-1 appearance-none cursor-pointer accent-gold"
+              className="hidden md:block w-16 lg:w-20 h-1 appearance-none cursor-pointer accent-gold touch-manipulation"
               aria-label="Volume"
             />
 
             <select
               value={speed}
               onChange={(e) => changeSpeed(Number(e.target.value))}
-              className="text-xs bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-white cursor-pointer"
+              className="text-[11px] sm:text-xs bg-white/10 border border-white/20 rounded-lg px-1.5 sm:px-2 py-2 sm:py-1.5 text-white cursor-pointer min-h-[44px] sm:min-h-0 touch-manipulation max-w-[52px] sm:max-w-none"
               aria-label="Playback speed"
             >
               {SPEEDS.map((s) => (
@@ -253,7 +284,7 @@ export default function LessonVideoPlayer({
             </select>
 
             <button type="button" onClick={toggleFullscreen} className={btnClass} aria-label="Fullscreen">
-              {fullscreen ? "⤢" : "⛶"}
+              <span className="text-base">{fullscreen ? "⤢" : "⛶"}</span>
             </button>
           </div>
         </div>

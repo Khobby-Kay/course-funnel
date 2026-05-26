@@ -9,6 +9,9 @@ export type PendingPayment = {
   courseSlug: string;
   provider: PaymentProvider | "demo";
   createdAt: number;
+  name?: string;
+  email?: string;
+  phone?: string;
 };
 
 const CACHE_KEY = "pending-payments";

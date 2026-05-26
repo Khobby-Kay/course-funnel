@@ -20,6 +20,7 @@ type GrantResponse = {
   ok?: boolean;
   courseSlug?: string;
   dashboardPath?: string;
+  confirmationEmailSent?: boolean;
   error?: string;
 };
 
@@ -31,6 +32,7 @@ function SuccessContent() {
   const courseFromUrl = searchParams.get("course")?.trim() || "";
 
   const [grantedCourseSlug, setGrantedCourseSlug] = useState<string | null>(null);
+  const [confirmationEmailSent, setConfirmationEmailSent] = useState(false);
   const [status, setStatus] = useState<"loading" | "success" | "failed">(
     reference && provider ? "loading" : "failed"
   );
@@ -67,6 +69,7 @@ function SuccessContent() {
 
           if (grantRes.ok && data.courseSlug) {
             setGrantedCourseSlug(data.courseSlug);
+            setConfirmationEmailSent(Boolean(data.confirmationEmailSent));
             setStatus("success");
             return;
           }
@@ -145,6 +148,11 @@ function SuccessContent() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Payment Successful</h1>
         <p className="text-white/70 text-lg mb-2">Your course is ready — open it below to start watching.</p>
+        {confirmationEmailSent && (
+          <p className="text-gold/90 text-sm mb-2">
+            We sent a confirmation email with your dashboard link. Check your inbox (and spam folder).
+          </p>
+        )}
         {reference && <p className="text-white/40 text-sm mb-8 font-mono">Ref: {reference}</p>}
 
         <section className="flex flex-col sm:flex-row gap-4 justify-center mb-6">

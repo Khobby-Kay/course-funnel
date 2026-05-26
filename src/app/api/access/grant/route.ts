@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, ACCESS_MAX_AGE } from "@/lib/access";
 import { grantAccessAfterPayment } from "@/lib/access/grant-access";
 import type { PaymentProvider } from "@/lib/payments/types";
+import { enrollStudentAndSendConfirmation } from "@/lib/students/enroll";
 
 type Body = {
   reference?: string;
@@ -31,11 +32,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
+    const emailResult = await enrollStudentAndSendConfirmation({
+      reference: result.reference,
+      courseSlug: result.courseSlug,
+      provider,
+    });
+
     const response = NextResponse.json({
       ok: true,
       reference: result.reference,
       courseSlug: result.courseSlug,
       dashboardPath: `/dashboard/${result.courseSlug}`,
+      confirmationEmailSent: emailResult.emailSent,
     });
 
     response.cookies.set(ACCESS_COOKIE, result.token, {

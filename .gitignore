@@ -44,6 +44,9 @@ yarn-error.log*
 # payment state (pending + confirmed; server-local)
 /data/payments/
 
+# student enrollments (local dev)
+/data/students/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

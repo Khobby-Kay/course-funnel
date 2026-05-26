@@ -11,16 +11,19 @@ export type MoolreStatusPayload = {
   metadata?: Record<string, unknown>;
 };
 
+/** Moolre txstatus: 1 = paid, 0 = pending, 2 = failed */
+export const MOOLRE_TXSTATUS_PAID = 1;
+
 export function isMoolrePaid(payload: MoolreStatusPayload): boolean {
   const status = Number(payload.status);
   if (status !== 1) return false;
 
   const txstatus = payload.data?.txstatus;
   if (txstatus === undefined || txstatus === null || txstatus === "") {
-    return true;
+    return false;
   }
 
-  return Number(txstatus) === 1;
+  return Number(txstatus) === MOOLRE_TXSTATUS_PAID;
 }
 
 export function parseMoolreAmount(payload: MoolreStatusPayload): number | undefined {

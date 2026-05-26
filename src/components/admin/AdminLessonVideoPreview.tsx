@@ -57,7 +57,7 @@ export default function AdminLessonVideoPreview({
   }
 
   return (
-    <div className="mb-3 max-w-md">
+    <div className="mb-3 w-full max-w-full sm:max-w-md">
       <LessonVideoPlayer src={url} title={title} theme="light" />
     </div>
   );

@@ -31,6 +31,9 @@ export async function initializePayment(
       courseSlug: input.courseSlug,
       provider: "demo",
       createdAt: Date.now(),
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
     });
     return {
       checkoutUrl: `${getAppUrl()}/success?reference=${reference}&provider=demo&demo=1&course=${input.courseSlug}`,
@@ -60,6 +63,9 @@ export async function initializePayment(
     courseSlug: input.courseSlug,
     provider: result.provider,
     createdAt: Date.now(),
+    name: input.name,
+    email: input.email,
+    phone: input.phone,
   });
 
   return result;
@@ -70,8 +76,10 @@ export async function verifyPayment(
   provider: PaymentProvider | "demo"
 ): Promise<VerifyPaymentResult> {
   if (provider === "demo" || reference.includes("-demo-")) {
+    const demoAllowed =
+      process.env.NODE_ENV !== "production" && process.env.PAYMENTS_DEMO_MODE === "true";
     return {
-      success: process.env.PAYMENTS_DEMO_MODE === "true",
+      success: demoAllowed,
       reference,
       provider: "moolre",
       amount: undefined,

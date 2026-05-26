@@ -131,6 +131,23 @@ export async function verifyMoolre(reference: string): Promise<VerifyPaymentResu
     };
   }
 
+  if (!response.ok) {
+    return {
+      success: false,
+      reference,
+      provider: "moolre",
+    };
+  }
+
+  const externalRef = payload.data?.externalref;
+  if (externalRef && externalRef !== reference) {
+    return {
+      success: false,
+      reference,
+      provider: "moolre",
+    };
+  }
+
   return buildVerifyResult(reference, payload);
 }
 
@@ -139,6 +156,6 @@ export function moolreAmountMatchesPrice(
   paidAmount: number | undefined,
   expectedPrice: number
 ): boolean {
-  if (paidAmount === undefined) return true;
+  if (paidAmount === undefined || !Number.isFinite(paidAmount)) return false;
   return Math.abs(paidAmount - expectedPrice) < 0.01;
 }

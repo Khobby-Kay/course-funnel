@@ -72,7 +72,7 @@ export default function ProtectedVideoPlayer({
 
   if (state.status === "loading" || state.status === "idle") {
     return (
-      <div className="mb-8 aspect-video rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+      <div className="mb-6 sm:mb-8 w-full max-w-full aspect-video rounded-none sm:rounded-2xl bg-white/5 border-y sm:border border-white/10 flex items-center justify-center">
         <p className="text-white/50 text-sm">Loading video…</p>
       </div>
     );
@@ -80,7 +80,7 @@ export default function ProtectedVideoPlayer({
 
   if (state.status === "none") {
     return (
-      <div className="mb-8 aspect-video rounded-2xl bg-white/5 border border-white/10 border-dashed flex flex-col items-center justify-center px-6 text-center gap-2">
+      <div className="mb-6 sm:mb-8 w-full max-w-full aspect-video rounded-none sm:rounded-2xl bg-white/5 border-y sm:border border-white/10 border-dashed flex flex-col items-center justify-center px-6 text-center gap-2">
         <span className="text-3xl opacity-40" aria-hidden>
           ▶
         </span>
@@ -91,17 +91,17 @@ export default function ProtectedVideoPlayer({
 
   if (state.status === "error") {
     return (
-      <div className="mb-8 aspect-video rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center px-6 text-center">
+      <div className="mb-6 sm:mb-8 w-full max-w-full aspect-video rounded-none sm:rounded-2xl bg-red-500/10 border-y sm:border border-red-500/30 flex items-center justify-center px-6 text-center">
         <p className="text-red-300 text-sm">{state.message}</p>
       </div>
     );
   }
 
   return (
-    <section className="mb-8">
+    <section className="mb-6 sm:mb-8 w-full max-w-full -mx-4 sm:mx-0">
       <LessonVideoPlayer src={state.url} title={title} poster={poster} theme="dark" />
-      <p className="mt-2 text-xs text-white/40">
-        Stream-only · enrolled access required · use controls for speed, volume, and fullscreen
+      <p className="mt-2 px-4 sm:px-0 text-xs text-white/40">
+        Tap video for play/pause · swipe seek bar · fullscreen on mobile supported
       </p>
     </section>
   );

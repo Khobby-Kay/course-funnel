@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { verifyMoolre } from "@/lib/payments/providers/moolre";
+import { getCourseBySlug } from "@/lib/courses/server";
+import { verifyMoolre, moolreAmountMatchesPrice } from "@/lib/payments/providers/moolre";
 import { isMoolrePaid, parseMoolreCourseSlug } from "@/lib/payments/moolre-status";
 import { recordConfirmedPayment } from "@/lib/payments/confirmed-store";
 import type { PaymentProvider } from "@/lib/payments/types";
@@ -55,6 +56,15 @@ export async function POST(request: Request) {
 
   if (!courseSlug) {
     return NextResponse.json({ received: true, skipped: "no course slug" });
+  }
+
+  const course = await getCourseBySlug(courseSlug);
+  if (!course) {
+    return NextResponse.json({ received: true, skipped: "unknown course" });
+  }
+
+  if (!moolreAmountMatchesPrice(verified.amount, course.marketing.course.price)) {
+    return NextResponse.json({ received: true, skipped: "amount mismatch" });
   }
 
   await recordConfirmedPayment({

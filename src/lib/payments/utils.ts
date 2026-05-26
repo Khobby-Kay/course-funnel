@@ -20,8 +20,9 @@ export function getAppUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 }
 
-/** True only when explicitly enabled — never auto-demo when API keys are missing (prevents free access). */
+/** True only when explicitly enabled in local dev — never in production (prevents free access). */
 export function isDemoMode(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
   return process.env.PAYMENTS_DEMO_MODE === "true";
 }
 

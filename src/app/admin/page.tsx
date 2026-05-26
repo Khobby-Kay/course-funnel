@@ -25,6 +25,12 @@ export default async function AdminDashboardPage() {
               View site
             </Link>
             <Link
+              href="/admin/students"
+              className="text-sm px-4 py-2 rounded-lg border border-white/20 hover:bg-white/10"
+            >
+              Students
+            </Link>
+            <Link
               href="/admin/courses/new"
               className="text-sm px-4 py-2 rounded-lg bg-gold text-black font-semibold hover:bg-gold-hover"
             >

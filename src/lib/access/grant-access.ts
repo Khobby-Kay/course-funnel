@@ -26,6 +26,7 @@ export type GrantAccessResult =
   | { ok: false; status: number; error: string };
 
 function isDemoPayment(reference: string, provider: string): boolean {
+  if (process.env.NODE_ENV === "production") return false;
   return provider === "demo" || reference.includes("-demo-");
 }
 
@@ -53,7 +54,7 @@ export async function resolveCourseSlugForPayment(
     return verified.courseSlug;
   }
 
-  return requestedSlug?.trim() || null;
+  return null;
 }
 
 export async function confirmPayment(
@@ -66,7 +67,10 @@ export async function confirmPayment(
   }
 
   const pending = await getPendingPayment(reference);
-  if (pending && pending.courseSlug !== courseSlug) {
+  if (!pending) {
+    return false;
+  }
+  if (pending.courseSlug !== courseSlug || pending.provider !== provider) {
     return false;
   }
 

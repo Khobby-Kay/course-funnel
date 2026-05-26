@@ -222,8 +222,8 @@ export default function CourseDashboard({ course, reference }: CourseDashboardPr
           />
         )}
 
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
-          <article className="max-w-3xl">
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+          <article className="max-w-3xl w-full min-w-0">
             <p className="text-gold text-sm font-semibold mb-1">
               Module {module.number} · {module.icon} {module.title}
             </p>

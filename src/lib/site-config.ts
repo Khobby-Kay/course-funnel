@@ -16,7 +16,7 @@ export const siteConfig = {
   ),
   lmsUrl: env("NEXT_PUBLIC_LMS_URL"),
   successRedirectSeconds: Number(env("NEXT_PUBLIC_SUCCESS_REDIRECT_SECONDS", "5")),
-  paymentsDemoMode: env("PAYMENTS_DEMO_MODE", "true") === "true",
+  paymentsDemoMode: env("PAYMENTS_DEMO_MODE", "false") === "true",
 };
 
 export const assets = {
