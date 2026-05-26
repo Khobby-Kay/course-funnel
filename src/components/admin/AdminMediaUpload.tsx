@@ -54,7 +54,7 @@ export default function AdminMediaUpload({
         if (response.status === 413) {
           throw new Error("Upload rejected: file is too large for this request. Try a smaller video.");
         }
-        throw new Error(data?.error ?? text || "Upload failed");
+        throw new Error(data?.error ?? (text || "Upload failed"));
       }
 
       onUploaded({
