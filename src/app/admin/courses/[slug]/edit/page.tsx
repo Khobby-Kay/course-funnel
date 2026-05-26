@@ -11,7 +11,7 @@ type PageProps = {
 
 export default async function AdminEditCoursePage({ params }: PageProps) {
   const { slug } = await params;
-  const course = loadCourseBySlug(slug);
+  const course = await loadCourseBySlug(slug);
   if (!course) notFound();
 
   return (

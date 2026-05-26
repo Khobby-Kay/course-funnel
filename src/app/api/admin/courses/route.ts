@@ -12,7 +12,7 @@ function revalidateCourse(slug: string) {
 }
 
 export async function GET() {
-  const courses = loadAllCourses();
+  const courses = await loadAllCourses();
   return NextResponse.json({ courses });
 }
 
@@ -25,12 +25,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
-    if (slugExists(slug)) {
+    if (await slugExists(slug)) {
       return NextResponse.json({ error: "A course with this slug already exists" }, { status: 409 });
     }
 
     const course = buildCourseFromForm({ ...body, slug });
-    saveCourse(course);
+    await saveCourse(course);
     revalidateCourse(course.slug);
 
     return NextResponse.json({ ok: true, course });

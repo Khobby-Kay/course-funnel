@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "setup:supabase": "node scripts/setup-supabase.mjs"
+    "setup:supabase": "node scripts/setup-supabase.mjs",
+    "migrate:courses": "node scripts/migrate-courses-to-supabase.mjs",
+    "sync:vercel:supabase": "node scripts/sync-vercel-supabase-env.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",

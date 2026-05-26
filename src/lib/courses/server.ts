@@ -23,7 +23,7 @@ export function toPageData(course: CourseDefinition): CoursePageData {
 }
 
 export async function getAllCourses(): Promise<CourseDefinition[]> {
-  return loadAllCourses();
+  return await loadAllCourses();
 }
 
 export async function getPublishedCourses(): Promise<CourseDefinition[]> {
@@ -32,7 +32,7 @@ export async function getPublishedCourses(): Promise<CourseDefinition[]> {
 }
 
 export async function getCourseBySlug(slug: string): Promise<CourseDefinition | undefined> {
-  return loadCourseBySlug(slug);
+  return await loadCourseBySlug(slug);
 }
 
 export async function getDefaultCourse(): Promise<CourseDefinition> {

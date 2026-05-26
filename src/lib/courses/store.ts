@@ -3,30 +3,35 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import { isServerlessDeploy } from "@/lib/runtime/filesystem";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  deleteCourseFromRemote,
+  listRemoteCourseSlugs,
+  loadCourseFromRemote,
+  saveCourseToRemote,
+} from "./remote-store";
 import { SEED_COURSES } from "./seed";
 import type { CourseDefinition } from "./types";
 
 const BUNDLED_COURSES_DIR = path.join(process.cwd(), "data", "courses");
 
-function getWritableCoursesDir(): string {
-  if (isServerlessDeploy()) {
-    return path.join("/tmp", "course-funnel", "courses");
-  }
+function getLocalCoursesDir(): string {
   return BUNDLED_COURSES_DIR;
 }
 
-function coursePath(slug: string): string {
-  return path.join(getWritableCoursesDir(), `${slug}.json`);
+function localCoursePath(slug: string): string {
+  return path.join(getLocalCoursesDir(), `${slug}.json`);
 }
 
-function ensureDataDir(): void {
-  const dir = getWritableCoursesDir();
+function ensureLocalDataDir(): void {
+  const dir = getLocalCoursesDir();
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-function listJsonSlugs(dir: string): string[] {
+function listLocalJsonSlugs(): string[] {
+  const dir = getLocalCoursesDir();
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
@@ -35,69 +40,84 @@ function listJsonSlugs(dir: string): string[] {
 }
 
 function seedIfEmpty(): void {
-  ensureDataDir();
-  const writableSlugs = listJsonSlugs(getWritableCoursesDir());
-  const bundledSlugs = listJsonSlugs(BUNDLED_COURSES_DIR);
-  if (writableSlugs.length > 0 || bundledSlugs.length > 0) return;
+  if (isServerlessDeploy()) return;
+  ensureLocalDataDir();
+  if (listLocalJsonSlugs().length > 0) return;
 
   for (const course of SEED_COURSES) {
-    fs.writeFileSync(coursePath(course.slug), JSON.stringify(course, null, 2), "utf8");
+    fs.writeFileSync(localCoursePath(course.slug), JSON.stringify(course, null, 2), "utf8");
   }
 }
 
-function readCourseFile(slug: string): CourseDefinition | null {
-  const paths = [path.join(getWritableCoursesDir(), `${slug}.json`)];
-  if (getWritableCoursesDir() !== BUNDLED_COURSES_DIR) {
-    paths.push(path.join(BUNDLED_COURSES_DIR, `${slug}.json`));
+function readLocalCourseFile(slug: string): CourseDefinition | null {
+  const file = localCoursePath(slug);
+  if (!fs.existsSync(file)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8")) as CourseDefinition;
+  } catch {
+    return null;
   }
-
-  for (const file of paths) {
-    if (!fs.existsSync(file)) continue;
-    try {
-      return JSON.parse(fs.readFileSync(file, "utf8")) as CourseDefinition;
-    } catch {
-      return null;
-    }
-  }
-  return null;
 }
 
-export function loadAllCourses(): CourseDefinition[] {
+export async function loadCourseBySlug(slug: string): Promise<CourseDefinition | undefined> {
   seedIfEmpty();
-  const slugs = new Set([...listJsonSlugs(BUNDLED_COURSES_DIR), ...listJsonSlugs(getWritableCoursesDir())]);
-  const courses: CourseDefinition[] = [];
+  const remote = await loadCourseFromRemote(slug);
+  if (remote) return remote;
+  return readLocalCourseFile(slug) ?? undefined;
+}
 
+export async function loadAllCourses(): Promise<CourseDefinition[]> {
+  seedIfEmpty();
+  const slugs = new Set([
+    ...listLocalJsonSlugs(),
+    ...(await listRemoteCourseSlugs()),
+  ]);
+
+  const courses: CourseDefinition[] = [];
   for (const slug of slugs) {
-    const course = readCourseFile(slug);
+    const course = await loadCourseBySlug(slug);
     if (course) courses.push(course);
   }
 
   return courses.sort((a, b) => a.marketing.course.title.localeCompare(b.marketing.course.title));
 }
 
-export function loadCourseBySlug(slug: string): CourseDefinition | undefined {
-  seedIfEmpty();
-  return readCourseFile(slug) ?? undefined;
+export async function saveCourse(course: CourseDefinition): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await saveCourseToRemote(course);
+  }
+
+  if (!isServerlessDeploy()) {
+    ensureLocalDataDir();
+    fs.writeFileSync(localCoursePath(course.slug), JSON.stringify(course, null, 2), "utf8");
+  }
 }
 
-export function saveCourse(course: CourseDefinition): void {
-  ensureDataDir();
-  fs.writeFileSync(coursePath(course.slug), JSON.stringify(course, null, 2), "utf8");
+export async function deleteCourseFile(slug: string): Promise<boolean> {
+  let deleted = false;
+
+  if (isSupabaseConfigured()) {
+    await deleteCourseFromRemote(slug);
+    deleted = true;
+  }
+
+  if (!isServerlessDeploy()) {
+    const file = localCoursePath(slug);
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+      deleted = true;
+    }
+  }
+
+  return deleted;
 }
 
-export function deleteCourseFile(slug: string): boolean {
-  ensureDataDir();
-  const file = coursePath(slug);
-  if (!fs.existsSync(file)) return false;
-  fs.unlinkSync(file);
-  return true;
-}
-
-export function slugExists(slug: string, exceptSlug?: string): boolean {
-  seedIfEmpty();
+export async function slugExists(slug: string, exceptSlug?: string): Promise<boolean> {
   if (exceptSlug && slug === exceptSlug) return false;
-  return (
-    fs.existsSync(path.join(getWritableCoursesDir(), `${slug}.json`)) ||
-    fs.existsSync(path.join(BUNDLED_COURSES_DIR, `${slug}.json`))
-  );
+  seedIfEmpty();
+
+  const remote = await listRemoteCourseSlugs();
+  if (remote.includes(slug)) return true;
+
+  return fs.existsSync(localCoursePath(slug));
 }

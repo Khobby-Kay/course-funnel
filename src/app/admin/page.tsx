@@ -5,8 +5,8 @@ import { loadAllCourses } from "@/lib/courses/store";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminDashboardPage() {
-  const courses = loadAllCourses();
+export default async function AdminDashboardPage() {
+  const courses = await loadAllCourses();
 
   return (
     <main className="min-h-screen bg-gray-light">

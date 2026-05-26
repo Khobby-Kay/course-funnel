@@ -40,11 +40,9 @@ if (!url || !serviceKey) {
   process.exit(1);
 }
 
-const BUCKET = "course-videos";
+const BUCKETS = ["course-videos", "course-data"];
 
-async function main() {
-  console.log("Supabase URL:", url);
-
+async function ensureBucket(bucketId) {
   const res = await fetch(`${url}/storage/v1/bucket`, {
     method: "POST",
     headers: {
@@ -53,26 +51,32 @@ async function main() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      id: BUCKET,
-      name: BUCKET,
+      id: bucketId,
+      name: bucketId,
       public: false,
     }),
   });
 
   const text = await res.text();
   if (res.ok) {
-    console.log(`✓ Bucket "${BUCKET}" created (private).`);
+    console.log(`✓ Bucket "${bucketId}" created (private).`);
     return;
   }
 
   if (res.status === 409 || text.toLowerCase().includes("already exists")) {
-    console.log(`✓ Bucket "${BUCKET}" already exists.`);
+    console.log(`✓ Bucket "${bucketId}" already exists.`);
     return;
   }
 
-  console.error("Failed to create bucket:", res.status, text);
-  console.log("\nIf API fails, run supabase/storage.sql in Supabase → SQL Editor instead.");
+  console.error(`Failed to create bucket "${bucketId}":`, res.status, text);
   process.exit(1);
+}
+
+async function main() {
+  console.log("Supabase URL:", url);
+  for (const bucket of BUCKETS) {
+    await ensureBucket(bucket);
+  }
 }
 
 main().catch((err) => {

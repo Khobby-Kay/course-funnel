@@ -16,7 +16,7 @@ function revalidateCourse(slug: string) {
 
 export async function GET(_request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const course = loadCourseBySlug(slug);
+  const course = await loadCourseBySlug(slug);
   if (!course) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ course });
 }
@@ -24,7 +24,7 @@ export async function GET(_request: Request, context: RouteContext) {
 export async function PUT(request: Request, context: RouteContext) {
   try {
     const { slug: currentSlug } = await context.params;
-    const existing = loadCourseBySlug(currentSlug);
+    const existing = await loadCourseBySlug(currentSlug);
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = (await request.json()) as CourseFormInput & {
@@ -34,7 +34,7 @@ export async function PUT(request: Request, context: RouteContext) {
     };
     const newSlug = slugify(body.slug || body.title);
 
-    if (newSlug !== currentSlug && slugExists(newSlug, currentSlug)) {
+    if (newSlug !== currentSlug && (await slugExists(newSlug, currentSlug))) {
       return NextResponse.json({ error: "Slug already in use" }, { status: 409 });
     }
 
@@ -56,11 +56,11 @@ export async function PUT(request: Request, context: RouteContext) {
     }
 
     if (newSlug !== currentSlug) {
-      deleteCourseFile(currentSlug);
+      await deleteCourseFile(currentSlug);
       revalidateCourse(currentSlug);
     }
 
-    saveCourse(course);
+    await saveCourse(course);
     revalidateCourse(course.slug);
 
     return NextResponse.json({ ok: true, course });
@@ -73,7 +73,7 @@ export async function PUT(request: Request, context: RouteContext) {
 export async function PATCH(request: Request, context: RouteContext) {
   try {
     const { slug } = await context.params;
-    const course = loadCourseBySlug(slug);
+    const course = await loadCourseBySlug(slug);
     if (!course) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = (await request.json()) as { status?: CourseDefinition["status"] };
@@ -82,7 +82,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
 
     const updated = { ...course, status: body.status };
-    saveCourse(updated);
+    await saveCourse(updated);
     revalidateCourse(slug);
 
     return NextResponse.json({ ok: true, course: updated });
@@ -94,7 +94,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const deleted = deleteCourseFile(slug);
+  const deleted = await deleteCourseFile(slug);
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   revalidateCourse(slug);

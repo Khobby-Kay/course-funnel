@@ -7,8 +7,8 @@ import { initializePaystack, verifyPaystack } from "./providers/paystack";
 import { recordPendingPayment } from "./pending-store";
 import { getAppUrl, isDemoMode, isMoolreConfigured } from "./utils";
 
-export function resolveCoursePricing(courseSlug: string): CoursePricing {
-  const course = loadCourseBySlug(courseSlug);
+export async function resolveCoursePricing(courseSlug: string): Promise<CoursePricing> {
+  const course = await loadCourseBySlug(courseSlug);
   if (!course) throw new Error("Course not found");
   const meta = course.marketing.course;
   return {
@@ -22,7 +22,7 @@ export function resolveCoursePricing(courseSlug: string): CoursePricing {
 export async function initializePayment(
   input: InitializePaymentInput
 ): Promise<InitializePaymentResult> {
-  const pricing = resolveCoursePricing(input.courseSlug);
+  const pricing = await resolveCoursePricing(input.courseSlug);
 
   if (isDemoMode()) {
     const reference = `cf-${input.courseSlug.replace(/[^a-z0-9-]/gi, "-").replace(/-+/g, "-").toLowerCase()}-demo-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;

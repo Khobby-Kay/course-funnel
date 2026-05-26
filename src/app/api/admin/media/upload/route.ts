@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing file, course, or field" }, { status: 400 });
     }
 
-    const course = loadCourseBySlug(courseSlug);
+    const course = await loadCourseBySlug(courseSlug);
     if (!course) {
       return NextResponse.json({ error: "Course not found. Save the course first." }, { status: 404 });
     }
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         ),
       }));
 
-      saveCourse({ ...course, lms: { ...course.lms, modules } });
+      await saveCourse({ ...course, lms: { ...course.lms, modules } });
 
       return NextResponse.json({
         ok: true,
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
       media.screenshots = shots;
     }
 
-    saveCourse({ ...course, media });
+    await saveCourse({ ...course, media });
 
     return NextResponse.json({
       ok: true,
