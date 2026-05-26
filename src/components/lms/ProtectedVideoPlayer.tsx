@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import LessonVideoPlayer from "@/components/lms/LessonVideoPlayer";
 
 type ProtectedVideoPlayerProps = {
   courseSlug: string;
@@ -69,12 +70,21 @@ export default function ProtectedVideoPlayer({
     };
   }, [courseSlug, lessonId]);
 
-  if (state.status === "none" || state.status === "idle") return null;
-
-  if (state.status === "loading") {
+  if (state.status === "loading" || state.status === "idle") {
     return (
       <div className="mb-8 aspect-video rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
         <p className="text-white/50 text-sm">Loading video…</p>
+      </div>
+    );
+  }
+
+  if (state.status === "none") {
+    return (
+      <div className="mb-8 aspect-video rounded-2xl bg-white/5 border border-white/10 border-dashed flex flex-col items-center justify-center px-6 text-center gap-2">
+        <span className="text-3xl opacity-40" aria-hidden>
+          ▶
+        </span>
+        <p className="text-white/50 text-sm">Video for this lesson is coming soon.</p>
       </div>
     );
   }
@@ -89,23 +99,9 @@ export default function ProtectedVideoPlayer({
 
   return (
     <section className="mb-8">
-      <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
-        <video
-          key={state.url}
-          src={state.url}
-          title={title}
-          poster={poster}
-          controls
-          controlsList="nodownload noplaybackrate"
-          disablePictureInPicture
-          playsInline
-          preload="metadata"
-          className="w-full h-full object-contain bg-black"
-          onContextMenu={(event) => event.preventDefault()}
-        />
-      </div>
+      <LessonVideoPlayer src={state.url} title={title} poster={poster} theme="dark" />
       <p className="mt-2 text-xs text-white/40">
-        Stream-only · link expires periodically · enrolled access required
+        Stream-only · enrolled access required · use controls for speed, volume, and fullscreen
       </p>
     </section>
   );

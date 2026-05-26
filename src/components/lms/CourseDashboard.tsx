@@ -324,9 +324,13 @@ function ModuleNav({
                 }`}
               >
                 <span className="mr-2 text-xs text-white/40">{lesson.number}.</span>
-                {lesson.videoPath && (
-                  <span className="mr-1 text-xs" title="Video lesson" aria-hidden>
+                {lesson.videoPath ? (
+                  <span className="mr-1 text-xs text-gold" title="Video available" aria-hidden>
                     ▶
+                  </span>
+                ) : (
+                  <span className="mr-1 text-xs text-white/25" title="No video yet" aria-hidden>
+                    ○
                   </span>
                 )}
                 {isDone && <span className="text-green-400 mr-1">✓</span>}
