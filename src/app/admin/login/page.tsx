@@ -3,10 +3,17 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+function isLocalHost(): boolean {
+  if (typeof window === "undefined") return true;
+  const host = window.location.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
+
 function AdminLoginForm({ from }: { from: string }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const local = isLocalHost();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,10 +30,14 @@ function AdminLoginForm({ from }: { from: string }) {
 
       if (!response.ok) {
         const data = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(
-          data.error ??
-            "Invalid password. Use ADMIN_PASSWORD from .env.local and restart npm run dev after changing it."
-        );
+        if (response.status === 401) {
+          throw new Error(
+            local
+              ? "Invalid password. Use ADMIN_PASSWORD from .env.local (then restart npm run dev)."
+              : "Invalid password on the live site. .env.local does not apply here — set ADMIN_PASSWORD in Vercel → Project → Settings → Environment Variables (e.g. admin154), save, and redeploy."
+          );
+        }
+        throw new Error(data.error ?? "Login failed");
       }
 
       window.location.assign(from);
@@ -58,7 +69,7 @@ function AdminLoginForm({ from }: { from: string }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="ADMIN_PASSWORD from .env.local"
+            placeholder={local ? "ADMIN_PASSWORD from .env.local" : "ADMIN_PASSWORD from Vercel env"}
             className="mt-2 w-full px-4 py-3 rounded-xl border border-black/15 bg-white text-black focus:border-purple focus:ring-2 focus:ring-purple/20 focus:outline-none"
             autoComplete="current-password"
           />
@@ -73,9 +84,18 @@ function AdminLoginForm({ from }: { from: string }) {
         </button>
 
         <p className="text-xs text-gray-muted mt-6 text-center leading-relaxed">
-          Password is <code className="font-mono bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in{" "}
-          <code className="font-mono bg-black/5 px-1 rounded">.env.local</code>. Restart{" "}
-          <code className="font-mono">npm run dev</code> after you change it.
+          {local ? (
+            <>
+              Local: <code className="font-mono bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in{" "}
+              <code className="font-mono bg-black/5 px-1 rounded">.env.local</code>. Restart{" "}
+              <code className="font-mono">npm run dev</code> after changes.
+            </>
+          ) : (
+            <>
+              Live site: set <code className="font-mono bg-black/5 px-1 rounded">ADMIN_PASSWORD</code> in
+              Vercel env vars (not .env.local), then redeploy.
+            </>
+          )}
         </p>
       </form>
     </main>

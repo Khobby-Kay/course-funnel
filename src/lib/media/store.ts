@@ -2,6 +2,7 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
+import { canWriteUnderData } from "@/lib/runtime/filesystem";
 import type { MediaUploadField } from "./types";
 import { IMAGE_MIME, VIDEO_MIME } from "./types";
 
@@ -76,6 +77,9 @@ export function savePrivateLessonVideo(
   buffer: Buffer,
   mime: string
 ): string {
+  if (!canWriteUnderData("course-media")) {
+    throw new Error("Cannot save lesson videos on disk here. Configure Supabase Storage.");
+  }
   const slug = sanitizeSlug(courseSlug);
   const safeLessonId = lessonId.replace(/[^a-z0-9-_]/gi, "").slice(0, 80);
   const dir = path.join(PRIVATE_MEDIA_ROOT, slug, "lessons");

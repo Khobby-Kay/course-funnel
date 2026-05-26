@@ -7,8 +7,14 @@ import {
   validateUpload,
 } from "@/lib/media/store";
 import type { MediaUploadField } from "@/lib/media/types";
+import {
+  canWritePublicMedia,
+  canWriteUnderData,
+  isServerlessDeploy,
+  supabaseRequiredForUploadsMessage,
+} from "@/lib/runtime/filesystem";
 import { getSupabaseAdminOrNull } from "@/lib/supabase/admin";
-import { COURSE_VIDEOS_BUCKET } from "@/lib/supabase/config";
+import { COURSE_VIDEOS_BUCKET, isSupabaseConfigured } from "@/lib/supabase/config";
 
 const PUBLIC_FIELDS = new Set<MediaUploadField>([
   "instructorPhoto",
@@ -48,6 +54,17 @@ export async function POST(request: Request) {
       const supabase = getSupabaseAdminOrNull();
       let videoPath: string;
 
+      if (!supabase && (isServerlessDeploy() || !canWriteUnderData("course-media"))) {
+        return NextResponse.json(
+          {
+            error: isSupabaseConfigured()
+              ? "Supabase client failed to initialize. Check SUPABASE_SERVICE_ROLE_KEY on Vercel."
+              : supabaseRequiredForUploadsMessage(),
+          },
+          { status: 503 }
+        );
+      }
+
       if (supabase) {
         const storagePath = `${courseSlug}/lessons/${lessonId}${mime.includes("webm") ? ".webm" : ".mp4"}`;
         const { error } = await supabase.storage
@@ -81,6 +98,17 @@ export async function POST(request: Request) {
 
     if (!PUBLIC_FIELDS.has(field)) {
       return NextResponse.json({ error: "Invalid upload field" }, { status: 400 });
+    }
+
+    if (!canWritePublicMedia()) {
+      return NextResponse.json(
+        {
+          error:
+            "Marketing images cannot be saved on the live site (read-only disk). " +
+            "Upload images while running locally, or commit files under public/course-media/.",
+        },
+        { status: 503 }
+      );
     }
 
     const isVideo = field === "previewVideo";
