@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import fs from "fs";
 import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, hasAccessToCourse } from "@/lib/access";
 import { getCourseBySlug } from "@/lib/courses/server";

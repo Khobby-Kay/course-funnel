@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function AdminLoginPage() {
-  const [from, setFrom] = useState("/admin");
+function AdminLoginForm({ from }: { from: string }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setFrom(params.get("from") || "/admin");
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -87,5 +82,19 @@ export default function AdminLoginPage() {
         </p>
       </form>
     </main>
+  );
+}
+
+function AdminLoginWithSearchParams() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "/admin";
+  return <AdminLoginForm from={from} />;
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<AdminLoginForm from="/admin" />}>
+      <AdminLoginWithSearchParams />
+    </Suspense>
   );
 }
