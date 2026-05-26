@@ -96,7 +96,21 @@ export async function verifyMoolre(reference: string) {
     }),
   });
 
-  const payload = await response.json();
+  let payload: {
+    status?: number;
+    data?: { txstatus?: number; metadata?: Record<string, unknown> };
+    metadata?: Record<string, unknown>;
+  };
+  try {
+    payload = await response.json();
+  } catch {
+    return {
+      success: false,
+      reference,
+      provider: "moolre" as const,
+    };
+  }
+
   const paid = payload?.status === 1 && payload?.data?.txstatus === 1;
   const meta = payload?.data?.metadata ?? payload?.metadata;
   const courseSlug =

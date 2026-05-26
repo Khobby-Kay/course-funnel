@@ -11,7 +11,7 @@ import { getConfirmedPayment, recordConfirmedPayment } from "@/lib/payments/conf
 import { verifyPayment } from "@/lib/payments";
 import { getPendingPayment } from "@/lib/payments/pending-store";
 import type { PaymentProvider } from "@/lib/payments/types";
-import { isDemoMode, parseCourseSlugFromReference } from "@/lib/payments/utils";
+import { parseCourseSlugFromReference } from "@/lib/payments/utils";
 
 export type GrantAccessInput = {
   reference: string;
@@ -47,9 +47,9 @@ export async function resolveCourseSlugForPayment(
     return requestedSlug?.trim() || null;
   }
 
-  if (!isDemoMode()) {
-    const verified = await verifyPayment(reference, provider);
-    if (verified.courseSlug) return verified.courseSlug;
+  const verified = await verifyPayment(reference, provider);
+  if (verified.success && verified.courseSlug) {
+    return verified.courseSlug;
   }
 
   return requestedSlug?.trim() || null;
@@ -60,17 +60,20 @@ export async function confirmPayment(
   provider: PaymentProvider | "demo",
   courseSlug: string
 ): Promise<boolean> {
-  if (isDemoPayment(reference, provider)) return true;
-
-  const stored = getConfirmedPayment(reference);
-  if (stored) {
-    return stored.courseSlug === courseSlug;
+  // Demo checkout only — never grant real providers without verification
+  if (isDemoPayment(reference, provider)) {
+    return process.env.PAYMENTS_DEMO_MODE === "true";
   }
 
-  if (isDemoMode()) return true;
+  const stored = getConfirmedPayment(reference);
+  if (stored?.courseSlug === courseSlug) {
+    return true;
+  }
 
   const verified = await verifyPayment(reference, provider);
-  if (!verified.success) return false;
+  if (!verified.success) {
+    return false;
+  }
 
   if (verified.courseSlug && verified.courseSlug !== courseSlug) {
     return false;

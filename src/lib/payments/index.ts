@@ -69,11 +69,11 @@ export async function verifyPayment(
   reference: string,
   provider: PaymentProvider | "demo"
 ): Promise<VerifyPaymentResult> {
-  if (provider === "demo" || reference.startsWith("demo-")) {
+  if (provider === "demo" || reference.includes("-demo-")) {
     return {
-      success: true,
+      success: process.env.PAYMENTS_DEMO_MODE === "true",
       reference,
-      provider: "paystack",
+      provider: "moolre",
       amount: undefined,
       currency: undefined,
     };
@@ -93,7 +93,9 @@ export async function verifyPayment(
 }
 
 export function isProviderConfigured(provider: PaymentProvider): boolean {
-  if (isDemoMode()) return true;
+  if (isDemoMode()) {
+    return process.env.PAYMENTS_DEMO_MODE === "true";
+  }
 
   switch (provider) {
     case "moolre":
