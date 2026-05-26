@@ -6,7 +6,6 @@ import Button from "@/components/ui/Button";
 import { PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
 import type { PaymentProvider } from "@/lib/payments/types";
-import { siteConfig } from "@/lib/site-config";
 
 type CheckoutFormProps = {
   data: CoursePageData;
@@ -63,13 +62,6 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
         <p className="text-gray-muted text-center mb-8 max-w-lg mx-auto">
           Complete checkout for <strong>{course.title}</strong> and get instant access.
         </p>
-
-        {siteConfig.paymentsDemoMode && (
-          <p className="mb-6 text-center text-sm text-purple bg-purple/10 border border-purple/20 rounded-xl py-3 px-4 max-w-lg mx-auto">
-            Demo mode — payments simulate success. Add API keys in{" "}
-            <code className="font-mono">.env.local</code> when ready.
-          </p>
-        )}
 
         <section className="grid lg:grid-cols-2 gap-8">
           <aside className="rounded-2xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm h-fit">
