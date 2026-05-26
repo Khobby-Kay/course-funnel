@@ -3,8 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import CountryPhoneFields from "@/components/checkout/CountryPhoneFields";
+import CourseCoverImage from "@/components/CourseCoverImage";
+import CheckMark from "@/components/ui/CheckMark";
 import { ACTIVE_PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
+import { DEFAULT_COUNTRY_CODE } from "@/lib/geo/countries";
 import type { PaymentProvider } from "@/lib/payments/types";
 
 type CheckoutFormProps = {
@@ -14,10 +18,16 @@ type CheckoutFormProps = {
 const MOOLRE_PROVIDER: PaymentProvider = "moolre";
 
 export default function CheckoutForm({ data }: CheckoutFormProps) {
-  const { course, ctas, valueStack, checkoutIncluded, landingPath, badge, brandName } = data;
+  const { course, valueStack, checkoutIncluded, landingPath, badge, brandName, media } = data;
   const paymentOption = ACTIVE_PAYMENT_OPTIONS[0];
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    region: "",
+    countryCode: DEFAULT_COUNTRY_CODE,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -71,22 +81,23 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
       </header>
 
       <article className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center">You&apos;re One Step Away</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center">Complete your enrollment</h1>
         <p className="text-gray-muted text-center mb-8 max-w-lg mx-auto">
-          Complete checkout for <strong>{course.title}</strong> and get instant access.
+          A few details and we&apos;ll send a Mobile Money prompt to your phone for{" "}
+          <strong>{course.title}</strong>.
         </p>
 
         <section className="grid lg:grid-cols-2 gap-8">
           <aside className="rounded-2xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm h-fit">
-            <h2 className="font-bold text-lg mb-6">Order Summary</h2>
+            <h2 className="font-bold text-lg mb-6">Order summary</h2>
 
             <section className="flex gap-4 mb-6 pb-6 border-b border-black/5">
-              <span
-                className="w-20 h-20 rounded-xl bg-gradient-to-br from-purple to-black shrink-0 flex items-center justify-center text-2xl"
-                aria-hidden
-              >
-                📚
-              </span>
+              <CourseCoverImage
+                title={course.title}
+                coverUrl={media?.coverImage}
+                badge={badge}
+                className="w-20 h-20 rounded-xl shrink-0"
+              />
               <div>
                 <h3 className="font-bold">{course.title}</h3>
                 <p className="text-sm text-gray-muted mt-1">
@@ -95,13 +106,11 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
               </div>
             </section>
 
-            <h3 className="font-semibold text-sm mb-3">What&apos;s included:</h3>
+            <h3 className="font-semibold text-sm mb-3">What&apos;s included</h3>
             <ul className="space-y-2 mb-6 max-h-48 overflow-y-auto">
               {checkoutIncluded.map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm text-gray-muted">
-                  <span className="text-purple" aria-hidden>
-                    ✔
-                  </span>
+                  <CheckMark className="w-4 h-4 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -134,7 +143,10 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
             className="rounded-2xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm"
             noValidate
           >
-            <h2 className="font-bold text-lg mb-6">Payment Details</h2>
+            <h2 className="font-bold text-lg mb-2">Your details</h2>
+            <p className="text-sm text-gray-muted mb-6">
+              We use this to send your receipt, course access, and occasional updates about your program.
+            </p>
 
             {error && (
               <p className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
@@ -145,7 +157,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
             <fieldset className="space-y-4 mb-6 border-0 p-0 m-0">
               <legend className="sr-only">Contact information</legend>
               <label className="block">
-                <span className="text-sm font-medium mb-1 block">Full Name</span>
+                <span className="text-sm font-medium mb-1 block">Full name</span>
                 <input
                   type="text"
                   name="name"
@@ -154,7 +166,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
                   value={form.name}
                   onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl border border-black/10 focus:border-purple focus:outline-none focus:ring-2 focus:ring-purple/20"
-                  placeholder="Enter your full name"
+                  placeholder="Your full name"
                 />
               </label>
               <label className="block">
@@ -170,46 +182,39 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
                   placeholder="you@email.com"
                 />
               </label>
-              <label className="block">
-                <span className="text-sm font-medium mb-1 block">MoMo Phone Number</span>
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  autoComplete="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:border-purple focus:outline-none focus:ring-2 focus:ring-purple/20"
-                  placeholder="0241234567 or +233..."
-                />
-              </label>
+
+              <CountryPhoneFields
+                countryCode={form.countryCode}
+                onCountryChange={(countryCode) => setForm((prev) => ({ ...prev, countryCode }))}
+                phone={form.phone}
+                onPhoneChange={(phone) => setForm((prev) => ({ ...prev, phone }))}
+                region={form.region}
+                onRegionChange={(region) => setForm((prev) => ({ ...prev, region }))}
+              />
             </fieldset>
 
             <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4">
               <p className="text-sm font-semibold text-purple">{paymentOption?.label ?? "Mobile Money"}</p>
               <p className="text-xs text-gray-muted mt-1">
-                {paymentOption?.hint ?? "MTN · Telecel · AT"} — you&apos;ll approve the payment on your phone via
-                Moolre.
+                After you submit, approve the charge on your phone (MTN, Telecel, or AT). No account login required.
               </p>
             </section>
 
             <Button type="submit" size="lg" className="w-full mb-4" disabled={isSubmitting}>
               {isSubmitting
                 ? "Sending MoMo prompt to your phone…"
-                : `Pay ${course.currency} ${course.price} with MoMo →`}
+                : `Pay ${course.currency} ${course.price} with MoMo`}
             </Button>
 
             <p className="text-center text-xs text-gray-muted mb-4">
               <Link href={landingPath} className="text-purple hover:underline">
-                ← Back to course page
+                Back to course page
               </Link>
             </p>
 
-            <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-muted">
-              <li className="flex items-center gap-1">🔒 Secure Moolre checkout</li>
-              <li className="flex items-center gap-1">📱 MTN · Telecel · AT Money</li>
-              <li className="flex items-center gap-1">↩️ Money-back guarantee</li>
-            </ul>
+            <p className="text-center text-xs text-gray-muted">
+              Secure payment · Instant access after confirmation · {course.guaranteeDays}-day money-back guarantee
+            </p>
           </form>
         </section>
       </article>

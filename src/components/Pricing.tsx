@@ -1,5 +1,6 @@
 import Button from "@/components/ui/Button";
 import CountdownTimer from "@/components/CountdownTimer";
+import CheckMark from "@/components/ui/CheckMark";
 import { ACTIVE_PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
 
@@ -54,9 +55,7 @@ export default function Pricing({ data }: PricingProps) {
             <ul className="space-y-2.5">
               {valueStack.slice(0, 5).map((item) => (
                 <li key={item.name} className="flex items-center gap-2 text-white/80 text-sm">
-                  <span className="text-gold" aria-hidden>
-                    ✔
-                  </span>
+                  <CheckMark className="w-4 h-4 shrink-0 text-gold" />
                   {item.name.split(" (")[0]}
                 </li>
               ))}
@@ -69,7 +68,7 @@ export default function Pricing({ data }: PricingProps) {
               {ctas.primary} →
             </Button>
             <p className="text-white/60 text-sm text-center">
-              🔒 Secure checkout · Instant access · {course.guaranteeDays}-day guarantee
+              Secure checkout · Instant access · {course.guaranteeDays}-day guarantee
             </p>
 
             <ul className="flex flex-wrap gap-2 justify-center">

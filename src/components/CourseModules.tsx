@@ -3,7 +3,7 @@ import type { CoursePageData } from "@/lib/courses/types";
 type CourseModulesProps = { data: CoursePageData };
 
 export default function CourseModules({ data }: CourseModulesProps) {
-  const { modules } = data;
+  const { modules, course } = data;
   return (
     <section id="modules" className="py-20 lg:py-28 bg-white scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,8 +23,8 @@ export default function CourseModules({ data }: CourseModulesProps) {
               key={module.number}
               className="rounded-2xl p-6 bg-gray-light border border-black/5 hover:border-purple/30 hover:shadow-lg transition-all group"
             >
-              <span className="text-3xl mb-4 block" aria-hidden>
-                {module.icon}
+              <span className="inline-flex w-10 h-10 rounded-xl bg-purple/10 text-purple font-bold items-center justify-center mb-4">
+                {module.number}
               </span>
               <span className="text-xs font-bold text-purple uppercase tracking-wider">
                 Module {module.number}
@@ -34,7 +34,7 @@ export default function CourseModules({ data }: CourseModulesProps) {
               </h3>
               <p className="text-gray-muted text-sm leading-relaxed mb-4">{module.description}</p>
               <p className="text-xs font-semibold text-purple bg-purple/10 rounded-lg px-3 py-2">
-                → Outcome: {module.outcome}
+                Outcome: {module.outcome}
               </p>
             </article>
           ))}
@@ -48,35 +48,18 @@ export default function CourseModules({ data }: CourseModulesProps) {
           </article>
         </div>
 
-        <div className="rounded-2xl bg-black text-white p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <span className="text-gold text-2xl" aria-hidden>
-              ⏱
-            </span>
-            <div>
-              <p className="text-white/60 text-sm">Duration</p>
-              <p className="font-bold text-lg">14 Days</p>
-            </div>
+        <div className="rounded-2xl bg-black text-white p-6 sm:p-8 grid sm:grid-cols-3 gap-6 text-center sm:text-left">
+          <div>
+            <p className="text-white/60 text-sm">Duration</p>
+            <p className="font-bold text-lg">{course.duration}</p>
           </div>
-          <div className="hidden sm:block w-px h-12 bg-white/20" aria-hidden />
-          <div className="flex items-center gap-3">
-            <span className="text-gold text-2xl" aria-hidden>
-              📊
-            </span>
-            <div>
-              <p className="text-white/60 text-sm">Level</p>
-              <p className="font-bold text-lg">Zero → Job-Ready</p>
-            </div>
+          <div>
+            <p className="text-white/60 text-sm">Level</p>
+            <p className="font-bold text-lg">Zero → Job-Ready</p>
           </div>
-          <div className="hidden sm:block w-px h-12 bg-white/20" aria-hidden />
-          <div className="flex items-center gap-3">
-            <span className="text-gold text-2xl" aria-hidden>
-              ♾
-            </span>
-            <div>
-              <p className="text-white/60 text-sm">Access</p>
-              <p className="font-bold text-lg">Lifetime + Updates</p>
-            </div>
+          <div>
+            <p className="text-white/60 text-sm">Access</p>
+            <p className="font-bold text-lg">Lifetime + Updates</p>
           </div>
         </div>
       </div>

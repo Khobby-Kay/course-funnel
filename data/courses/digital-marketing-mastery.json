@@ -55,6 +55,35 @@
       "Sell a skill companies already pay for",
       "Lifetime access — learn at your pace"
     ],
+    "whatYouGet": [
+      "25+ HD video lessons — full 5-module roadmap",
+      "Client acquisition script pack — DMs, emails, and outreach",
+      "90-day content calendar templates",
+      "Proposal, invoice & contract templates",
+      "Niche & offer builder worksheets",
+      "Private student community access",
+      "Certificate of completion + lifetime updates"
+    ],
+    "offerSystems": [
+      {
+        "name": "System 1 — Get clients (Leads)",
+        "tagline": "Fill your pipeline without ad spend first.",
+        "playbooks": [
+          { "title": "Niche & offer picker", "description": "Choose what to sell and who pays for it in 48 hours." },
+          { "title": "Organic traffic playbook", "description": "WhatsApp, Instagram, and Facebook strategies for African audiences." },
+          { "title": "DM outreach scripts", "description": "Start conversations that lead to paid work — not ghosting." }
+        ]
+      },
+      {
+        "name": "System 2 — Get paid (Sales)",
+        "tagline": "Turn conversations into MoMo payments.",
+        "playbooks": [
+          { "title": "Proposal & invoice pack", "description": "Look professional and collect faster." },
+          { "title": "Closing conversation framework", "description": "Handle price and timing objections without discounting." },
+          { "title": "Retainer & package upsell sheet", "description": "Move from one-off gigs to monthly income." }
+        ]
+      }
+    ],
     "painAgitateSolution": [
       {
         "icon": "😤",

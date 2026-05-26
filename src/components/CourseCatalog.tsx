@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import CourseCoverImage from "@/components/CourseCoverImage";
+import CheckMark from "@/components/ui/CheckMark";
 import {
   courseCheckoutPath,
   courseLandingPath,
@@ -7,32 +9,29 @@ import {
 import { getPublishedCourses } from "@/lib/courses/server";
 
 const TRUST_STATS = [
-  { value: "1,400+", label: "Students enrolled", icon: "👥" },
-  { value: "4.8★", label: "Average rating", icon: "⭐" },
-  { value: "30 days", label: "Money-back guarantee", icon: "🛡️" },
-  { value: "Lifetime", label: "Course access", icon: "∞" },
+  { value: "1,400+", label: "Students enrolled" },
+  { value: "4.8 / 5", label: "Average rating" },
+  { value: "30 days", label: "Money-back guarantee" },
+  { value: "Lifetime", label: "Course access" },
 ] as const;
 
 const WHY_US = [
   {
-    icon: "🎯",
-    title: "Built to Get You Paid",
+    title: "Built to get you paid",
     description:
       "Every program focuses on income — not theory. Templates, scripts, and action steps you use with real clients.",
     accent: "border-gold/30 bg-gold/5",
   },
   {
-    icon: "🌍",
-    title: "Made for African Markets",
+    title: "Made for African markets",
     description:
-      "Pricing, outreach, and examples tuned for Ghana & West Africa — MoMo, WhatsApp, and local businesses.",
+      "Pricing, outreach, and examples tuned for Ghana and West Africa — MoMo, WhatsApp, and local businesses.",
     accent: "border-purple/30 bg-purple/5",
   },
   {
-    icon: "⚡",
-    title: "Start This Week",
+    title: "Start this week",
     description:
-      "Clear 14-day roadmaps. No fluff. Enroll today, apply tomorrow, and build proof fast.",
+      "Clear roadmaps. No fluff. Enroll today, apply tomorrow, and build proof fast.",
     accent: "border-white/20 bg-white/5",
   },
 ] as const;
@@ -90,7 +89,7 @@ export default async function CourseCatalog() {
               </div>
 
               <p className="text-white/40 text-sm flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1">
-                <span>🔒 Secure checkout</span>
+                <span>Secure checkout</span>
                 <span className="hidden sm:inline text-white/20">·</span>
                 <span>Instant access after payment</span>
                 <span className="hidden sm:inline text-white/20">·</span>
@@ -110,9 +109,6 @@ export default async function CourseCatalog() {
                       key={stat.label}
                       className="rounded-2xl bg-black/40 border border-white/10 p-4 text-center"
                     >
-                      <span className="text-2xl mb-2 block" aria-hidden>
-                        {stat.icon}
-                      </span>
                       <p className="text-2xl font-bold text-gold">{stat.value}</p>
                       <p className="text-white/50 text-xs mt-1">{stat.label}</p>
                     </div>
@@ -138,9 +134,7 @@ export default async function CourseCatalog() {
                 key={badge}
                 className="text-sm font-medium text-gray-muted flex items-center gap-2"
               >
-                <span className="text-purple" aria-hidden>
-                  ✔
-                </span>
+                <CheckMark className="w-4 h-4" />
                 {badge}
               </span>
             ))}
@@ -174,8 +168,8 @@ export default async function CourseCatalog() {
               Choose Your Path to Income
             </h2>
             <p className="text-gray-muted leading-relaxed">
-              Each program is a complete business-in-a-box — training, templates, and a clear
-              roadmap. Pick one and start this week.
+              Playbook-style programs — video training plus copy-paste SOPs and templates. Pick
+              offers, leads, sales, or the full marketing system. One payment, lifetime access.
             </p>
           </div>
 
@@ -197,29 +191,20 @@ export default async function CourseCatalog() {
                   }`}
                 >
                   <div className="relative bg-gradient-to-br from-purple via-purple-light/80 to-black text-white overflow-hidden min-h-[200px]">
-                    {item.media?.screenshots?.[0] && (
-                      <div className="absolute inset-0 opacity-40 group-hover:opacity-50 transition-opacity">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.media.screenshots[0]}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
+                    <CourseCoverImage
+                      title={meta.title}
+                      coverUrl={item.media?.coverImage ?? item.media?.screenshots?.[0]}
+                      badge={item.badge}
+                      className="absolute inset-0 opacity-50 group-hover:opacity-60 transition-opacity"
+                      imageClassName="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="relative p-8">
                     {isFeatured && (
                       <span className="absolute top-4 right-4 z-20 px-3 py-1 rounded-full bg-gold text-black text-xs font-bold uppercase tracking-wide">
                         Most Popular
                       </span>
                     )}
-                    <div
-                      className="absolute -bottom-8 -right-8 w-40 h-40 bg-gold/10 rounded-full blur-2xl group-hover:bg-gold/20 transition-colors"
-                      aria-hidden
-                    />
-                    <span className="text-5xl mb-4 block relative" aria-hidden>
-                      {catalog.emoji}
-                    </span>
                     <h3 className="text-2xl sm:text-3xl font-bold mb-2 relative">{meta.title}</h3>
                     <p className="text-gold font-semibold text-sm mb-3 relative">{catalog.tagline}</p>
                     <p className="text-white/75 text-sm leading-relaxed relative max-w-md">
@@ -235,12 +220,7 @@ export default async function CourseCatalog() {
                           key={highlight}
                           className="flex items-start gap-3 text-sm text-gray-muted"
                         >
-                          <span
-                            className="w-5 h-5 rounded-full bg-purple/10 text-purple flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
-                            aria-hidden
-                          >
-                            ✔
-                          </span>
+                          <CheckMark className="w-4 h-4 shrink-0 mt-0.5" />
                           {highlight}
                         </li>
                       ))}
@@ -259,9 +239,7 @@ export default async function CourseCatalog() {
                         Save {meta.currency} {savings} today
                       </p>
                       <div className="flex flex-wrap gap-3 text-xs text-gray-muted">
-                        <span className="flex items-center gap-1">
-                          <span className="text-gold">★</span> {meta.rating}
-                        </span>
+                        <span>Rating {meta.rating}</span>
                         <span>·</span>
                         <span>{meta.students} students</span>
                         <span>·</span>
@@ -310,9 +288,6 @@ export default async function CourseCatalog() {
                 key={item.title}
                 className={`rounded-2xl border p-8 ${item.accent} hover:border-gold/40 transition-colors`}
               >
-                <span className="text-4xl mb-4 block" aria-hidden>
-                  {item.icon}
-                </span>
                 <h3 className="text-xl font-bold mb-3">{item.title}</h3>
                 <p className="text-white/65 text-sm leading-relaxed">{item.description}</p>
               </article>
@@ -324,9 +299,6 @@ export default async function CourseCatalog() {
       {/* Guarantee band — gold = safety & value */}
       <section className="py-16 bg-gradient-to-r from-purple/20 via-gold/10 to-purple/20 border-y border-gold/20">
         <article className="max-w-3xl mx-auto px-4 text-center">
-          <span className="text-4xl mb-4 block" aria-hidden>
-            🛡️
-          </span>
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-black">
             30-Day Money-Back Guarantee
           </h2>

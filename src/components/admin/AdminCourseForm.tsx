@@ -19,7 +19,7 @@ const emptyForm: CourseFormInput = {
   badge: "",
   brandName: "",
   status: "draft",
-  catalog: { emoji: "📚", tagline: "", description: "", highlights: [""] },
+  catalog: { emoji: "", tagline: "", description: "", highlights: [""] },
   course: {
     headline: "",
     subheadline: "",
@@ -176,16 +176,9 @@ export default function AdminCourseForm({ mode, initial }: AdminCourseFormProps)
 
       <fieldset className="space-y-4 rounded-2xl border border-black/10 bg-white p-6">
         <legend className="text-lg font-bold px-1">Catalog card (homepage)</legend>
-        <label className="block">
-          <span className="text-sm font-medium">Emoji</span>
-          <input
-            value={form.catalog.emoji}
-            onChange={(e) =>
-              update("catalog", { ...form.catalog, emoji: e.target.value })
-            }
-            className="mt-1 w-24 px-4 py-2.5 rounded-xl border border-black/10 text-2xl text-center"
-          />
-        </label>
+        <p className="text-sm text-gray-muted">
+          Upload the course cover image in the Images section after saving (edit mode).
+        </p>
         <label className="block">
           <span className="text-sm font-medium">Tagline</span>
           <input
@@ -260,11 +253,16 @@ export default function AdminCourseForm({ mode, initial }: AdminCourseFormProps)
           </label>
           <label className="block">
             <span className="text-sm font-medium">Currency</span>
-            <input
-              value={form.course.currency}
+            <select
+              value={form.course.currency || "GHS"}
               onChange={(e) => updateCourse("currency", e.target.value)}
               className="mt-1 w-full px-4 py-2.5 rounded-xl border border-black/10"
-            />
+            >
+              <option value="GHS">GHS — Ghana cedis (Mobile Money)</option>
+            </select>
+            <p className="text-xs text-gray-muted mt-1">
+              Mobile Money requires GHS. Other currencies will be added with card payments.
+            </p>
           </label>
         </div>
       </fieldset>

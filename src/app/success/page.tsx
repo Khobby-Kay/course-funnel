@@ -148,10 +148,10 @@ function SuccessContent() {
     <main className="min-h-screen bg-gradient-to-br from-black via-purple/30 to-black flex items-center justify-center px-4">
       <article className="max-w-lg w-full text-center">
         <div
-          className="inline-flex w-20 h-20 rounded-full bg-gold/20 text-4xl items-center justify-center mx-auto mb-6"
+          className="inline-flex w-20 h-20 rounded-full bg-gold/20 text-4xl items-center justify-center mx-auto mb-6 text-gold font-bold"
           aria-hidden
         >
-          🎉
+          ✓
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Payment Successful</h1>
         <p className="text-white/70 text-lg mb-2">Your course is ready — open it below to start watching.</p>

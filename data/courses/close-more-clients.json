@@ -1,0 +1,313 @@
+{
+  "id": "close-more-clients",
+  "slug": "close-more-clients",
+  "badge": "SL",
+  "brandName": "Sales Playbook",
+  "status": "published",
+  "catalog": {
+    "emoji": "",
+    "tagline": "Turn conversations into MoMo payments",
+    "description": "Discovery calls, objection handling, and closing frameworks for selling services on WhatsApp and phone — no sleazy tactics.",
+    "highlights": [
+      "Discovery call script",
+      "Objection handling bank",
+      "MoMo closing flow"
+    ]
+  },
+  "marketing": {
+    "course": {
+      "title": "Close More Clients",
+      "headline": "Stop Losing Deals at \"Let Me Think About It\"",
+      "subheadline": "The sales playbook for service sellers — discovery questions, objection scripts, and closing flows that work when payment means Mobile Money, not a card form.",
+      "price": 349,
+      "oldPrice": 699,
+      "totalValue": 2900,
+      "currency": "GHS",
+      "lessons": "16+",
+      "duration": "5 Days",
+      "rating": 4.9,
+      "students": "280+",
+      "discount": "NEW PROGRAM",
+      "roiStatement": "One closed deal covers this 10× over",
+      "guaranteeDays": 30
+    },
+    "whatYouGet": [
+      "16+ video lessons — sales without being salesy",
+      "Discovery call script — 15 questions that uncover budget and urgency",
+      "Objection handling bank — price, time, trust, and \"I need to ask\"",
+      "WhatsApp closing sequence — from interest to MoMo payment",
+      "Proposal & invoice templates — look professional, get paid faster",
+      "Follow-up after no — recover deals that went quiet",
+      "Lifetime access + script updates"
+    ],
+    "offerSystems": [
+      {
+        "name": "System 1 — Discovery",
+        "tagline": "Diagnose before you prescribe.",
+        "playbooks": [
+          {
+            "title": "15-question discovery script",
+            "description": "Uncover pain, budget, timeline, and decision-maker in one call."
+          },
+          {
+            "title": "Problem-solution bridge",
+            "description": "Transition from their words to your offer without a hard pitch."
+          },
+          {
+            "title": "Call notes template",
+            "description": "Capture what matters so follow-up is personal, not generic."
+          }
+        ]
+      },
+      {
+        "name": "System 2 — Close",
+        "tagline": "Ask for the payment with confidence.",
+        "playbooks": [
+          {
+            "title": "Objection response library",
+            "description": "Word-for-word replies to the 12 most common stalls."
+          },
+          {
+            "title": "MoMo checkout script",
+            "description": "Send payment link, confirm receipt, and onboard in one thread."
+          },
+          {
+            "title": "Proposal one-pager",
+            "description": "Scope, price, timeline, and guarantee on a single page."
+          }
+        ]
+      }
+    ],
+    "navLinks": [
+      {
+        "label": "Playbooks",
+        "href": "#playbooks"
+      },
+      {
+        "label": "What's included",
+        "href": "#included"
+      },
+      {
+        "label": "Curriculum",
+        "href": "#modules"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ],
+    "heroOutcomes": [
+      "Discovery calls that feel like help, not pitches",
+      "Scripts for every common objection",
+      "MoMo-ready closing flow on WhatsApp",
+      "Proposals that make saying yes easy"
+    ],
+    "painAgitateSolution": [
+      {
+        "icon": "1",
+        "title": "Losing at the finish line",
+        "description": "They liked you — then disappeared. Weak closing costs more than weak marketing.",
+        "accent": "border-red-200 bg-red-50/80"
+      },
+      {
+        "icon": "2",
+        "title": "Discounting to close",
+        "description": "You drop price when you should handle the objection. Margin dies, respect dies with it.",
+        "accent": "border-orange-200 bg-orange-50/80"
+      },
+      {
+        "icon": "3",
+        "title": "The closing playbook",
+        "description": "Structured discovery, scripted objections, clear ask. Sales becomes a process you repeat.",
+        "accent": "border-purple/20 bg-purple/5"
+      }
+    ],
+    "transformation": {
+      "before": [
+        "Free advice on calls, no payment",
+        "Panic when they say \"too expensive\"",
+        "Chasing ghosts after proposals",
+        "No script — winging every conversation"
+      ],
+      "after": [
+        "Calls that qualify and close",
+        "Calm responses to objections",
+        "WhatsApp flow through to MoMo",
+        "Repeatable sales process"
+      ]
+    },
+    "howItWorks": [
+      {
+        "step": 1,
+        "title": "Learn the scripts",
+        "description": "Short modules — each gives you language you use the same day."
+      },
+      {
+        "step": 2,
+        "title": "Run one real conversation",
+        "description": "Discovery or follow-up using the templates. Real reps beat perfect theory."
+      },
+      {
+        "step": 3,
+        "title": "Close & iterate",
+        "description": "MoMo payment → onboard → refine. Track wins in the script doc."
+      }
+    ],
+    "valueStack": [
+      {
+        "name": "Close More Clients course (16+ lessons)",
+        "value": 1100
+      },
+      {
+        "name": "Discovery call script & notes template",
+        "value": 400
+      },
+      {
+        "name": "Objection handling bank (12 scenarios)",
+        "value": 350
+      },
+      {
+        "name": "WhatsApp → MoMo closing sequence",
+        "value": 300
+      },
+      {
+        "name": "Proposal & invoice templates",
+        "value": 250
+      },
+      {
+        "name": "Lifetime updates",
+        "value": 500
+      }
+    ],
+    "modules": [
+      {
+        "number": 1,
+        "title": "Sales mindset",
+        "description": "Help first, ask clearly — ethical selling for people who hate selling.",
+        "icon": "1",
+        "outcome": "Your personal sales rules"
+      },
+      {
+        "number": 2,
+        "title": "Discovery that qualifies",
+        "description": "Questions that reveal if they're a buyer or a browser.",
+        "icon": "2",
+        "outcome": "Completed discovery script"
+      },
+      {
+        "number": 3,
+        "title": "Present the offer",
+        "description": "Bridge from their problem to your packaged solution.",
+        "icon": "3",
+        "outcome": "One recorded practice pitch"
+      },
+      {
+        "number": 4,
+        "title": "Handle objections",
+        "description": "Price, timing, trust — without discounting by default.",
+        "icon": "4",
+        "outcome": "Objection cheat sheet saved"
+      },
+      {
+        "number": 5,
+        "title": "Close on MoMo",
+        "description": "Payment ask, confirmation, and onboarding in WhatsApp.",
+        "icon": "5",
+        "outcome": "First payment collected"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Efua",
+        "location": "Takoradi",
+        "text": "The objection bank alone paid for the course. I used the price response verbatim and closed same day.",
+        "avatar": "E",
+        "result": "Closed same-day deal"
+      },
+      {
+        "name": "Kwame",
+        "location": "Accra",
+        "text": "Discovery script stopped me from over-explaining. Shorter calls, more yeses.",
+        "avatar": "K",
+        "result": "2 clients in 2 weeks"
+      }
+    ],
+    "faqItems": [
+      {
+        "question": "I'm not a \"salesperson\" — is this for me?",
+        "answer": "Yes. This is for freelancers and creators who need to collect money without feeling pushy."
+      },
+      {
+        "question": "Does this work on WhatsApp only?",
+        "answer": "Scripts work on WhatsApp and phone. MoMo closing flow is written for Ghana payments."
+      }
+    ],
+    "audience": [
+      {
+        "label": "Freelancers",
+        "hook": "Convert DMs into deposits"
+      },
+      {
+        "label": "Coaches & consultants",
+        "hook": "Run calls that end in payment"
+      },
+      {
+        "label": "Agency sellers",
+        "hook": "Stop sending proposals into the void"
+      }
+    ],
+    "guarantee": {
+      "headline": "Try it risk-free for 30 days",
+      "body": "Go through the program and use the templates. If you would not pay 10× the price for what you got, email us for a full refund. We only win when you win."
+    },
+    "ctas": {
+      "primary": "Yes — I want instant access",
+      "secondary": "See the full offer",
+      "checkout": "Complete my enrollment",
+      "final": "Enroll now — lock in this price",
+      "sticky": "Get access — GHS 349"
+    },
+    "instructor": {
+      "name": "African Skills Academy",
+      "title": "Ethical sales for digital services",
+      "quote": "The fortune is in the follow-up — and in asking clearly for the payment."
+    }
+  },
+  "lms": {
+    "modules": [
+      {
+        "id": "close-more-clients-m1",
+        "number": 1,
+        "title": "Start here",
+        "icon": "1",
+        "outcome": "Your first action step done",
+        "lessons": [
+          {
+            "id": "close-more-clients-m1-l1",
+            "number": 1,
+            "title": "Welcome to Close More Clients",
+            "duration": "8 min",
+            "summary": "How to get results fast from this playbook.",
+            "content": [
+              "Watch this first — it shows you exactly how to use every template.",
+              "Do not binge. Complete one module, apply it, then move on."
+            ],
+            "actionStep": "Write your #1 income goal for the next 30 days."
+          }
+        ]
+      }
+    ],
+    "bonusResources": [
+      {
+        "id": "templates",
+        "title": "Playbook templates (PDF)",
+        "icon": "PDF"
+      },
+      {
+        "id": "scripts",
+        "title": "Copy-paste scripts",
+        "icon": "DOC"
+      }
+    ]
+  }
+}

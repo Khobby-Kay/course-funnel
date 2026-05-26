@@ -48,7 +48,7 @@ export function buildCourseFromForm(input: CourseFormInput, existing?: CourseDef
     status: input.status,
     media: existing?.media,
     catalog: {
-      emoji: input.catalog.emoji || "📚",
+      emoji: input.catalog.emoji || "",
       tagline: input.catalog.tagline,
       description: input.catalog.description,
       highlights: input.catalog.highlights.filter(Boolean),

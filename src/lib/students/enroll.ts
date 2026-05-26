@@ -32,6 +32,8 @@ export async function enrollStudentAndSendConfirmation(params: {
     email,
     name,
     phone,
+    region: pending?.region?.trim() || existing?.region || "",
+    countryCode: pending?.countryCode?.trim() || existing?.countryCode || "GH",
     courseSlug: params.courseSlug,
     provider: params.provider,
     enrolledAt: existing?.enrolledAt ?? Date.now(),

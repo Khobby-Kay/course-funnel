@@ -8,3 +8,5 @@ export const SEED_COURSES: CourseDefinition[] = [
   socialMediaProCourse,
   aiCreatorCourse,
 ];
+
+export { createGrandSlamOffersCourse, createClientLeadsSystemCourse, createCloseMoreClientsCourse } from "./hormozi-blueprints";

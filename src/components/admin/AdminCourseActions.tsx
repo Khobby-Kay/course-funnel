@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { CourseDefinition } from "@/lib/courses/types";
 import { courseLandingPath } from "@/lib/courses";
+import CourseCoverImage from "@/components/CourseCoverImage";
 
 const STATUS_STYLES: Record<CourseDefinition["status"], string> = {
   published: "bg-green-100 text-green-800 border-green-200",
@@ -66,10 +67,15 @@ export default function AdminCourseActions({ course }: { course: CourseDefinitio
   return (
     <tr className="border-b border-black/5 hover:bg-gray-light/50">
       <td className="py-4 pl-6 pr-4">
-        <span className="text-2xl mr-2" aria-hidden>
-          {course.catalog.emoji}
-        </span>
+      <div className="flex items-center gap-3">
+        <CourseCoverImage
+          title={course.marketing.course.title}
+          coverUrl={course.media?.coverImage}
+          badge={course.badge}
+          className="w-10 h-10 rounded-lg shrink-0"
+        />
         <span className="font-semibold">{course.marketing.course.title}</span>
+      </div>
       </td>
       <td className="py-4 pr-4 font-mono text-sm text-gray-muted">/courses/{course.slug}</td>
       <td className="py-4 pr-4">

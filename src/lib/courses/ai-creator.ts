@@ -23,7 +23,7 @@ export const aiCreatorCourse: CourseDefinition = {
       price: 98,
       oldPrice: 298,
       totalValue: 494,
-      currency: "USD",
+      currency: "GHS",
       lessons: "30+",
       duration: "2 Days",
       rating: 4.9,

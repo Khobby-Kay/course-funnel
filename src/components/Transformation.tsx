@@ -1,3 +1,4 @@
+import CheckMark from "@/components/ui/CheckMark";
 import type { CoursePageData } from "@/lib/courses/types";
 
 type TransformationProps = { data: CoursePageData };
@@ -43,9 +44,7 @@ export default function Transformation({ data }: TransformationProps) {
             <ul className="space-y-4">
               {transformation.after.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-white">
-                  <span className="text-gold shrink-0" aria-hidden>
-                    ✔
-                  </span>
+                  <CheckMark className="w-5 h-5 shrink-0 mt-0.5 text-gold" />
                   {item}
                 </li>
               ))}

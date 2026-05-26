@@ -18,13 +18,16 @@ export default function ProblemSolution({ data }: ProblemSolutionProps) {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {painAgitateSolution.map((card) => (
+          {painAgitateSolution.map((card, index) => (
             <article
               key={card.title}
               className={`rounded-2xl p-8 bg-white border ${card.accent} shadow-sm hover:shadow-md transition-shadow`}
             >
-              <span className="text-3xl mb-4 block" aria-hidden>
-                {card.icon}
+              <span
+                className="inline-flex w-8 h-8 rounded-full bg-purple/10 text-purple text-sm font-bold items-center justify-center mb-4"
+                aria-hidden
+              >
+                {index + 1}
               </span>
               <h3 className="text-xl font-bold text-black mb-3">{card.title}</h3>
               <p className="text-gray-muted leading-relaxed">{card.description}</p>

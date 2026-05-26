@@ -1,4 +1,5 @@
 import { loadCourseBySlug } from "@/lib/courses/store";
+import { assertMoolreCurrency, normalizeCurrencyCode } from "./moolre-currency";
 import type { InitializePaymentInput, InitializePaymentResult, PaymentProvider, VerifyPaymentResult } from "./types";
 import type { CoursePricing } from "./types";
 import { initializeFlutterwave, verifyFlutterwave } from "./providers/flutterwave";
@@ -15,7 +16,7 @@ export async function resolveCoursePricing(courseSlug: string): Promise<CoursePr
     slug: course.slug,
     title: meta.title,
     price: meta.price,
-    currency: meta.currency,
+    currency: normalizeCurrencyCode(meta.currency) || "GHS",
   };
 }
 
@@ -34,6 +35,8 @@ export async function initializePayment(
       name: input.name,
       email: input.email,
       phone: input.phone,
+      region: input.region,
+      countryCode: input.countryCode,
     });
     return {
       checkoutUrl: `${getAppUrl()}/success?reference=${reference}&provider=demo&demo=1&course=${input.courseSlug}`,
@@ -66,6 +69,8 @@ export async function initializePayment(
     name: input.name,
     email: input.email,
     phone: input.phone,
+    region: input.region,
+    countryCode: input.countryCode,
   });
 
   return result;

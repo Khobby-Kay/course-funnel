@@ -26,8 +26,13 @@ export default function Instructor({ data }: InstructorProps) {
                 className="object-cover"
                 placeholder={
                   <div className="text-center text-white p-8 w-full h-full flex flex-col items-center justify-center">
-                    <div className="w-32 h-32 mb-4 rounded-full bg-white/10 flex items-center justify-center text-6xl">
-                      👨🏾‍💼
+                    <div className="w-32 h-32 mb-4 rounded-full bg-white/10 flex items-center justify-center text-3xl font-bold text-gold">
+                      {instructor.name
+                        .split(" ")
+                        .map((w) => w[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
                     </div>
                     <p className="text-white/60 text-sm">Upload instructor photo in admin</p>
                   </div>

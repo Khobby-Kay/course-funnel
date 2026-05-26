@@ -6,6 +6,7 @@ export type CourseMedia = {
 };
 
 export type MediaUploadField =
+  | "coverImage"
   | "instructorPhoto"
   | "previewVideo"
   | "previewVideoPoster"

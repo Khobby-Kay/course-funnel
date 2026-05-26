@@ -5,6 +5,7 @@ import {
   parseMoolreCourseSlug,
   type MoolreStatusPayload,
 } from "../moolre-status";
+import { assertMoolreCurrency } from "../moolre-currency";
 import { isMoolrePromptSent, moolreErrorMessage } from "../moolre-errors";
 import { moolreNetworkLabel, normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone } from "../moolre-phone";
 import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
@@ -92,7 +93,8 @@ async function initializeMoolreDirectMomo(params: {
   appUrl: string;
 }): Promise<InitializePaymentResult> {
   const payer = normalizeGhanaMoMoPhone(params.input.phone);
-  const channel = resolveMoolreChannelFromPhone(payer);
+  const channel = String(resolveMoolreChannelFromPhone(payer));
+  const currency = assertMoolreCurrency(params.pricing.currency);
 
   const response = await fetch(`${getMoolreBaseUrl()}/open/transact/payment`, {
     method: "POST",
@@ -104,7 +106,7 @@ async function initializeMoolreDirectMomo(params: {
       externalref: params.reference,
       callback: `${params.appUrl}/api/webhooks/moolre`,
       redirect: params.redirect,
-      currency: params.pricing.currency,
+      currency,
       accountnumber: params.accountNumber,
       payer,
       channel,
@@ -144,6 +146,8 @@ async function initializeMoolreHostedLink(params: {
   redirect: string;
   appUrl: string;
 }): Promise<InitializePaymentResult> {
+  const currency = assertMoolreCurrency(params.pricing.currency);
+
   const response = await fetch(`${getMoolreBaseUrl()}/embed/link`, {
     method: "POST",
     headers: getMoolreHeaders(),
@@ -155,7 +159,7 @@ async function initializeMoolreHostedLink(params: {
       callback: `${params.appUrl}/api/webhooks/moolre`,
       redirect: params.redirect,
       reusable: "0",
-      currency: params.pricing.currency,
+      currency,
       accountnumber: params.accountNumber,
       metadata: {
         name: params.input.name,

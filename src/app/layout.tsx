@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Lexend } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const lexend = Lexend({
+  variable: "--font-lexend",
   subsets: ["latin"],
   display: "swap",
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+    <html lang="en" className={`${lexend.variable} scroll-smooth`}>
       <body className="min-h-screen antialiased font-sans">{children}</body>
     </html>
   );

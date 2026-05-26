@@ -69,7 +69,7 @@ export default function Footer() {
             © {new Date().getFullYear()} African Skills Academy. All rights reserved.
           </p>
           <p className="text-white/30 text-xs flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>🔒 Secure payments</span>
+            <span>Secure payments</span>
             <span>·</span>
             <span>30-day guarantee</span>
             <span>·</span>

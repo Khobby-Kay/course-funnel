@@ -6,6 +6,8 @@ import CourseModules from "@/components/CourseModules";
 import HowItWorks from "@/components/HowItWorks";
 import CoursePreview from "@/components/CoursePreview";
 import ValueStack from "@/components/ValueStack";
+import WhatYouGet from "@/components/WhatYouGet";
+import OfferSystems from "@/components/OfferSystems";
 import WhoIsThisFor from "@/components/WhoIsThisFor";
 import Instructor from "@/components/Instructor";
 import Testimonials from "@/components/Testimonials";
@@ -33,6 +35,8 @@ export default function CourseLanding({ data }: CourseLandingProps) {
         <CourseModules data={data} />
         <HowItWorks data={data} />
         <CoursePreview data={data} />
+        <WhatYouGet data={data} />
+        <OfferSystems data={data} />
         <ValueStack data={data} />
         <WhoIsThisFor data={data} />
         <Instructor data={data} />

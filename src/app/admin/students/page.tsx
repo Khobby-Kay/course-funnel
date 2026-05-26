@@ -17,8 +17,10 @@ export default async function AdminStudentsPage() {
       <header className="bg-black text-white border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold">Students &amp; Email</h1>
-            <p className="text-white/50 text-sm">View enrollments and message your students</p>
+            <h1 className="text-xl font-bold">Students &amp; applicants</h1>
+            <p className="text-white/50 text-sm">
+              Emails, phone numbers, regions, and enrollment status for everyone who applied
+            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

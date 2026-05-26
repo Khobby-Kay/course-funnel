@@ -4,6 +4,8 @@ export type InitializePaymentInput = {
   name: string;
   email: string;
   phone: string;
+  region: string;
+  countryCode: string;
   provider: PaymentProvider;
   courseSlug: string;
 };

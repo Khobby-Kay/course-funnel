@@ -1,4 +1,5 @@
 import Button from "@/components/ui/Button";
+import CheckMark from "@/components/ui/CheckMark";
 import {
   courseCheckoutPath,
   courseLandingPath,
@@ -27,9 +28,12 @@ export default async function AccessDeniedPage({
   return (
     <main className="min-h-screen bg-black flex items-center justify-center px-4">
       <article className="max-w-md text-center text-white">
-        <span className="text-5xl mb-6 block" aria-hidden>
-          🔒
-        </span>
+        <div
+          className="inline-flex w-16 h-16 rounded-full bg-gold/20 items-center justify-center mx-auto mb-6"
+          aria-hidden
+        >
+          <CheckMark className="w-8 h-8 text-gold" />
+        </div>
         <h1 className="text-3xl font-bold mb-4">Course Access Required</h1>
         <p className="text-white/70 mb-2 leading-relaxed">
           {fromCourse

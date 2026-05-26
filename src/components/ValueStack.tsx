@@ -1,4 +1,5 @@
 import Button from "@/components/ui/Button";
+import CheckMark from "@/components/ui/CheckMark";
 import type { CoursePageData } from "@/lib/courses/types";
 
 type ValueStackProps = { data: CoursePageData };
@@ -12,14 +13,15 @@ export default function ValueStack({ data }: ValueStackProps) {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <p className="text-purple font-bold uppercase tracking-wider text-sm mb-2">
-            The Complete Offer
+            The grand slam offer
           </p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            Here&apos;s Everything You Get Today
+            Here&apos;s everything you get today
           </h2>
           <p className="text-gray-muted leading-relaxed">
-            If you bought these separately, you&apos;d pay {course.currency}{" "}
-            {totalValue.toLocaleString()}+. You get the full stack for one payment.
+            If you bought each piece separately, you&apos;d pay {course.currency}{" "}
+            {totalValue.toLocaleString()}+. You get the full stack for one payment — and keep it
+            forever.
           </p>
         </div>
 
@@ -28,9 +30,7 @@ export default function ValueStack({ data }: ValueStackProps) {
             {valueStack.map((item) => (
               <li key={item.name} className="flex items-center justify-between gap-4 p-5">
                 <span className="flex items-center gap-3 text-sm sm:text-base">
-                  <span className="w-6 h-6 rounded-full bg-purple/10 text-purple flex items-center justify-center text-xs font-bold shrink-0">
-                    ✔
-                  </span>
+                  <CheckMark className="w-6 h-6 shrink-0" />
                   {item.name}
                 </span>
                 <span className="text-gray-muted text-sm font-medium shrink-0 line-through">

@@ -1,7 +1,5 @@
 import type { CoursePageData } from "@/lib/courses/types";
 
-const ICONS = ["🌱", "🎓", "🚀", "💼", "💻", "🎨"];
-
 type WhoIsThisForProps = { data: CoursePageData };
 
 export default function WhoIsThisFor({ data }: WhoIsThisForProps) {
@@ -25,8 +23,11 @@ export default function WhoIsThisFor({ data }: WhoIsThisForProps) {
               key={item.label}
               className="rounded-2xl border border-black/5 bg-gray-light p-6 hover:border-purple/30 transition-colors"
             >
-              <span className="text-3xl mb-3 block" aria-hidden>
-                {ICONS[index % ICONS.length]}
+              <span
+                className="inline-flex w-7 h-7 rounded-full bg-gold/20 text-purple text-xs font-bold items-center justify-center mb-3"
+                aria-hidden
+              >
+                {index + 1}
               </span>
               <h3 className="font-bold text-lg mb-1">{item.label}</h3>
               <p className="text-gray-muted text-sm">{item.hook}</p>

@@ -18,6 +18,7 @@ import { getSupabaseAdminOrNull } from "@/lib/supabase/admin";
 import { COURSE_VIDEOS_BUCKET, isSupabaseConfigured } from "@/lib/supabase/config";
 
 const PUBLIC_FIELDS = new Set<MediaUploadField>([
+  "coverImage",
   "instructorPhoto",
   "previewVideo",
   "previewVideoPoster",
@@ -118,7 +119,8 @@ export async function POST(request: Request) {
 
     const media: CourseMedia = { ...(course.media ?? {}) };
 
-    if (field === "instructorPhoto") media.instructorPhoto = saved.publicUrl;
+    if (field === "coverImage") media.coverImage = saved.publicUrl;
+    else if (field === "instructorPhoto") media.instructorPhoto = saved.publicUrl;
     else if (field === "previewVideo") media.previewVideoUrl = saved.publicUrl;
     else if (field === "previewVideoPoster") media.previewVideoPoster = saved.publicUrl;
     else if (field.startsWith("screenshot-")) {

@@ -18,8 +18,20 @@ export default function AdminMediaSection({ courseSlug, media, onChange }: Admin
     <fieldset className="space-y-4 rounded-2xl border border-black/10 bg-white p-6">
       <legend className="text-lg font-bold px-1">Images &amp; preview video</legend>
       <p className="text-sm text-gray-muted">
-        Uploads appear on the course sales page. Lesson videos are uploaded in the LMS section below.
+        Uploads appear on the course sales page and catalog. Lesson videos are uploaded in the LMS section below.
       </p>
+
+      <AdminMediaUpload
+        courseSlug={courseSlug}
+        field="coverImage"
+        label="Course cover image"
+        hint="Shown on the homepage catalog, checkout, and admin list (recommended 1200×630)"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        currentUrl={media.coverImage}
+        onUploaded={({ media: next }) => {
+          if (next && typeof next === "object") onChange(next as CourseMedia);
+        }}
+      />
 
       <div className="grid sm:grid-cols-2 gap-4">
         <AdminMediaUpload

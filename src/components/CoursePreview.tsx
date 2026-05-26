@@ -1,5 +1,6 @@
 import { assets, hasAsset } from "@/lib/site-config";
 import MediaImage from "@/components/MediaImage";
+import CheckMark from "@/components/ui/CheckMark";
 import type { CoursePageData } from "@/lib/courses/types";
 
 const CHECKLIST = [
@@ -147,12 +148,7 @@ export default function CoursePreview({ data }: CoursePreviewProps) {
             <ul className="space-y-4 list-none">
               {CHECKLIST.map((item) => (
                 <li key={item} className="flex items-center gap-4">
-                  <span
-                    className="w-8 h-8 rounded-lg bg-purple/10 text-purple flex items-center justify-center font-bold text-sm shrink-0"
-                    aria-hidden
-                  >
-                    ✔
-                  </span>
+                  <CheckMark className="w-8 h-8 shrink-0" />
                   <span className="font-medium">{item}</span>
                 </li>
               ))}

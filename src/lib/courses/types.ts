@@ -3,6 +3,7 @@ import type { CourseModule } from "@/lib/course-content";
 export type CourseStatus = "published" | "draft" | "archived";
 
 export type CourseMedia = {
+  coverImage?: string;
   instructorPhoto?: string;
   previewVideoUrl?: string;
   previewVideoPoster?: string;
@@ -33,8 +34,24 @@ export type CourseCatalogCard = {
   highlights: string[];
 };
 
+export type OfferPlaybook = {
+  title: string;
+  description: string;
+};
+
+/** Hormozi-style grouped implementation systems (Leads, Sales, Delivery, Profit). */
+export type OfferSystem = {
+  name: string;
+  tagline: string;
+  playbooks: OfferPlaybook[];
+};
+
 export type CourseMarketing = {
   course: CourseMeta;
+  /** Skool-style bullet list — what members get immediately. */
+  whatYouGet?: string[];
+  /** Grouped playbook stacks with named SOPs/templates. */
+  offerSystems?: OfferSystem[];
   navLinks: { label: string; href: string }[];
   heroOutcomes: string[];
   painAgitateSolution: {

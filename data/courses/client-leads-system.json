@@ -1,0 +1,317 @@
+{
+  "id": "client-leads-system",
+  "slug": "client-leads-system",
+  "badge": "LD",
+  "brandName": "Leads System",
+  "status": "published",
+  "catalog": {
+    "emoji": "",
+    "tagline": "Fill your pipeline without ad spend",
+    "description": "Lead generation playbooks for WhatsApp, Instagram, and referrals — built for African budgets and buyer behavior.",
+    "highlights": [
+      "Organic + low-budget ads",
+      "DM & outreach scripts",
+      "Lead nurture templates"
+    ]
+  },
+  "marketing": {
+    "course": {
+      "title": "The Client Leads System",
+      "headline": "Get Strangers to Raise Their Hand and Say \"I'm Interested\"",
+      "subheadline": "A practical lead system for Ghana and West Africa — content hooks, DM scripts, lead magnets, and follow-up sequences that turn attention into booked calls.",
+      "price": 399,
+      "oldPrice": 799,
+      "totalValue": 3400,
+      "currency": "GHS",
+      "lessons": "22+",
+      "duration": "10 Days",
+      "rating": 4.8,
+      "students": "420+",
+      "discount": "ENROLLMENT OPEN",
+      "roiStatement": "One new client pays for this many times over",
+      "guaranteeDays": 30
+    },
+    "whatYouGet": [
+      "22+ video lessons — lead gen without guessing",
+      "Lead magnet builder — PDF/checklist your audience actually wants",
+      "30-day content hook library — posts that start conversations",
+      "Cold & warm DM scripts for WhatsApp and Instagram",
+      "Lead nurture sequence — 5 follow-ups that aren't annoying",
+      "Simple tracking sheet — know where every lead came from",
+      "Lifetime access + future lead templates"
+    ],
+    "offerSystems": [
+      {
+        "name": "System 1 — Attract",
+        "tagline": "Get attention from the right people.",
+        "playbooks": [
+          {
+            "title": "Hook & headline bank",
+            "description": "50+ proven openers adapted for local business owners."
+          },
+          {
+            "title": "Lead magnet builder",
+            "description": "Checklist, template, or mini-guide that trades value for contact info."
+          },
+          {
+            "title": "Profile conversion audit",
+            "description": "Bio, link, and pinned post setup that converts views to DMs."
+          }
+        ]
+      },
+      {
+        "name": "System 2 — Nurture & book",
+        "tagline": "Turn interest into booked conversations.",
+        "playbooks": [
+          {
+            "title": "DM qualification script",
+            "description": "Three questions that filter serious buyers in under 2 minutes."
+          },
+          {
+            "title": "5-touch follow-up sequence",
+            "description": "WhatsApp messages when they go quiet — without being pushy."
+          },
+          {
+            "title": "Booking & reminder templates",
+            "description": "Calendar links, MoMo deposit asks, and show-up reminders."
+          }
+        ]
+      }
+    ],
+    "navLinks": [
+      {
+        "label": "Playbooks",
+        "href": "#playbooks"
+      },
+      {
+        "label": "What's included",
+        "href": "#included"
+      },
+      {
+        "label": "Curriculum",
+        "href": "#modules"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ],
+    "heroOutcomes": [
+      "A lead magnet you can publish this week",
+      "DM scripts that start real conversations",
+      "Content plan that attracts buyers — not likes",
+      "Follow-up system so leads don't go cold"
+    ],
+    "painAgitateSolution": [
+      {
+        "icon": "1",
+        "title": "Posting with no leads",
+        "description": "You get views but no DMs. Content without a lead system is entertainment.",
+        "accent": "border-red-200 bg-red-50/80"
+      },
+      {
+        "icon": "2",
+        "title": "Feast or famine",
+        "description": "One good month, then silence. Without a pipeline, you're always starting from zero.",
+        "accent": "border-orange-200 bg-orange-50/80"
+      },
+      {
+        "icon": "3",
+        "title": "The leads system",
+        "description": "Attract → capture → nurture → book. Repeat weekly until the pipeline is full.",
+        "accent": "border-purple/20 bg-purple/5"
+      }
+    ],
+    "transformation": {
+      "before": [
+        "Random posting, no strategy",
+        "Afraid to DM strangers",
+        "No list, no follow-up",
+        "Waiting for referrals only"
+      ],
+      "after": [
+        "Weekly content that generates DMs",
+        "Scripts for warm and cold outreach",
+        "Lead magnet collecting contacts",
+        "Follow-up sequence running on autopilot"
+      ]
+    },
+    "howItWorks": [
+      {
+        "step": 1,
+        "title": "Enroll & unlock",
+        "description": "Instant access to every lesson, script, and template."
+      },
+      {
+        "step": 2,
+        "title": "Launch your lead magnet",
+        "description": "Publish one asset that trades value for WhatsApp numbers or emails."
+      },
+      {
+        "step": 3,
+        "title": "Run the weekly rhythm",
+        "description": "Content → DMs → follow-up → booked calls. Track it on one sheet."
+      }
+    ],
+    "valueStack": [
+      {
+        "name": "Client Leads System course (22+ lessons)",
+        "value": 1300
+      },
+      {
+        "name": "Lead magnet builder & examples",
+        "value": 400
+      },
+      {
+        "name": "30-day hook & content library",
+        "value": 350
+      },
+      {
+        "name": "DM & outreach script pack",
+        "value": 350
+      },
+      {
+        "name": "5-touch nurture sequence",
+        "value": 300
+      },
+      {
+        "name": "Lead tracking spreadsheet",
+        "value": 150
+      },
+      {
+        "name": "Lifetime updates",
+        "value": 550
+      }
+    ],
+    "modules": [
+      {
+        "number": 1,
+        "title": "Choose your lead channel",
+        "description": "WhatsApp, Instagram, or both — pick where your buyers already are.",
+        "icon": "1",
+        "outcome": "One primary channel"
+      },
+      {
+        "number": 2,
+        "title": "Build the magnet",
+        "description": "Create a checklist or template worth saving their number for.",
+        "icon": "2",
+        "outcome": "Published lead magnet"
+      },
+      {
+        "number": 3,
+        "title": "Content that converts",
+        "description": "Hooks, stories, and CTAs that drive DMs — not just engagement.",
+        "icon": "3",
+        "outcome": "2-week content calendar"
+      },
+      {
+        "number": 4,
+        "title": "Outreach & DMs",
+        "description": "Warm and cold scripts that feel human, not spammy.",
+        "icon": "4",
+        "outcome": "10 conversations started"
+      },
+      {
+        "number": 5,
+        "title": "Nurture & book",
+        "description": "Follow up until they book or say no — with templates for both.",
+        "icon": "5",
+        "outcome": "First call booked"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Kofi",
+        "location": "Kumasi",
+        "text": "The DM script got me 4 replies in one afternoon. I was terrified of outreach before this.",
+        "avatar": "K",
+        "result": "4 qualified DMs day 1"
+      },
+      {
+        "name": "Ama",
+        "location": "Accra",
+        "text": "Lead magnet + follow-up sequence = 3 discovery calls in 10 days. All organic.",
+        "avatar": "A",
+        "result": "3 calls in 10 days"
+      }
+    ],
+    "faqItems": [
+      {
+        "question": "Do I need ad budget?",
+        "answer": "No. The core system is organic. We include a simple intro to boosting posts later if you want."
+      },
+      {
+        "question": "Will this work outside Ghana?",
+        "answer": "Yes — WhatsApp-first outreach works across West Africa. Examples use GHS and local context."
+      }
+    ],
+    "audience": [
+      {
+        "label": "Beginners",
+        "hook": "Get your first leads without ads"
+      },
+      {
+        "label": "Freelancers",
+        "hook": "Stop waiting for referrals"
+      },
+      {
+        "label": "Agencies",
+        "hook": "Fill the top of your pipeline weekly"
+      }
+    ],
+    "guarantee": {
+      "headline": "Try it risk-free for 30 days",
+      "body": "Go through the program and use the templates. If you would not pay 10× the price for what you got, email us for a full refund. We only win when you win."
+    },
+    "ctas": {
+      "primary": "Yes — I want instant access",
+      "secondary": "See the full offer",
+      "checkout": "Complete my enrollment",
+      "final": "Enroll now — lock in this price",
+      "sticky": "Get access — GHS 399"
+    },
+    "instructor": {
+      "name": "African Skills Academy",
+      "title": "Client acquisition for African markets",
+      "quote": "Leads are the lifeblood. One predictable system beats ten random tactics."
+    }
+  },
+  "lms": {
+    "modules": [
+      {
+        "id": "client-leads-system-m1",
+        "number": 1,
+        "title": "Start here",
+        "icon": "1",
+        "outcome": "Your first action step done",
+        "lessons": [
+          {
+            "id": "client-leads-system-m1-l1",
+            "number": 1,
+            "title": "Welcome to Client Leads System",
+            "duration": "8 min",
+            "summary": "How to get results fast from this playbook.",
+            "content": [
+              "Watch this first — it shows you exactly how to use every template.",
+              "Do not binge. Complete one module, apply it, then move on."
+            ],
+            "actionStep": "Write your #1 income goal for the next 30 days."
+          }
+        ]
+      }
+    ],
+    "bonusResources": [
+      {
+        "id": "templates",
+        "title": "Playbook templates (PDF)",
+        "icon": "PDF"
+      },
+      {
+        "id": "scripts",
+        "title": "Copy-paste scripts",
+        "icon": "DOC"
+      }
+    ]
+  }
+}

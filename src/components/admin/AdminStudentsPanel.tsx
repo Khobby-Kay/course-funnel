@@ -1,17 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { getCountryByCode } from "@/lib/geo/countries";
 
-type EnrollmentRow = {
+type StudentRow = {
   reference: string;
   email: string;
   name: string;
   phone: string;
+  region: string;
+  countryCode: string;
+  countryName?: string;
   courseSlug: string;
   courseTitle: string;
   provider: string;
-  enrolledAt: number;
+  enrolledAt?: number;
+  startedAt?: number;
   confirmationEmailSentAt?: number;
+  status: "enrolled" | "payment_pending";
 };
 
 type CourseOption = { slug: string; title: string };
@@ -28,11 +34,11 @@ function formatDate(ms: number): string {
 }
 
 export default function AdminStudentsPanel({ courses }: Props) {
-  const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
+  const [rows, setRows] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [filterCourse, setFilterCourse] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"" | "enrolled" | "payment_pending">("");
   const [selectedReference, setSelectedReference] = useState("");
 
   const [subject, setSubject] = useState("");
@@ -45,9 +51,21 @@ export default function AdminStudentsPanel({ courses }: Props) {
     setError(null);
     try {
       const res = await fetch("/api/admin/students");
-      const data = (await res.json()) as { enrollments?: EnrollmentRow[]; error?: string };
+      const data = (await res.json()) as {
+        enrollments?: StudentRow[];
+        applications?: StudentRow[];
+        error?: string;
+      };
       if (!res.ok) throw new Error(data.error ?? "Could not load students");
-      setEnrollments(data.enrollments ?? []);
+
+      const enrolled = (data.enrollments ?? []).map((e) => ({ ...e, status: "enrolled" as const }));
+      const pending = (data.applications ?? []).filter(
+        (a) => a.status === "payment_pending"
+      );
+      const merged = [...enrolled, ...pending].sort(
+        (a, b) => (b.enrolledAt ?? b.startedAt ?? 0) - (a.enrolledAt ?? a.startedAt ?? 0)
+      );
+      setRows(merged);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load students");
     } finally {
@@ -59,9 +77,11 @@ export default function AdminStudentsPanel({ courses }: Props) {
     loadStudents();
   }, [loadStudents]);
 
-  const filtered = filterCourse
-    ? enrollments.filter((e) => e.courseSlug === filterCourse)
-    : enrollments;
+  const filtered = rows.filter((row) => {
+    if (filterCourse && row.courseSlug !== filterCourse) return false;
+    if (filterStatus && row.status !== filterStatus) return false;
+    return true;
+  });
 
   const handleSend = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -73,7 +93,7 @@ export default function AdminStudentsPanel({ courses }: Props) {
     }
 
     if (!selectedReference && !filterCourse) {
-      setSendResult("Select a course filter or a specific student to email.");
+      setSendResult("Filter by course or select a student to email enrolled learners only.");
       return;
     }
 
@@ -111,14 +131,51 @@ export default function AdminStudentsPanel({ courses }: Props) {
     }
   };
 
+  const exportCsv = () => {
+    const headers = [
+      "Name",
+      "Email",
+      "Phone",
+      "Region",
+      "Country",
+      "Course",
+      "Status",
+      "Provider",
+      "Reference",
+      "Date",
+    ];
+    const lines = filtered.map((r) => [
+      r.name,
+      r.email,
+      r.phone,
+      r.region,
+      r.countryName ?? getCountryByCode(r.countryCode)?.name ?? r.countryCode,
+      r.courseTitle,
+      r.status,
+      r.provider,
+      r.reference,
+      formatDate(r.enrolledAt ?? r.startedAt ?? 0),
+    ]);
+    const csv = [headers, ...lines]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "students.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-8">
       <section className="rounded-2xl bg-white border border-black/5 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-black/5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold">Enrolled students ({enrollments.length})</h2>
+            <h2 className="text-lg font-bold">Students & applicants ({filtered.length})</h2>
             <p className="text-sm text-gray-muted mt-1">
-              Students who completed checkout. Confirmation emails send automatically after payment.
+              Everyone who started checkout — enrolled after payment, or pending if MoMo was not completed.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -137,6 +194,17 @@ export default function AdminStudentsPanel({ courses }: Props) {
                 </option>
               ))}
             </select>
+            <select
+              value={filterStatus}
+              onChange={(e) =>
+                setFilterStatus(e.target.value as "" | "enrolled" | "payment_pending")
+              }
+              className="text-sm border border-black/10 rounded-lg px-3 py-2 bg-white"
+            >
+              <option value="">All statuses</option>
+              <option value="enrolled">Enrolled (paid)</option>
+              <option value="payment_pending">Payment pending</option>
+            </select>
             <button
               type="button"
               onClick={loadStudents}
@@ -144,43 +212,56 @@ export default function AdminStudentsPanel({ courses }: Props) {
             >
               Refresh
             </button>
+            <button
+              type="button"
+              onClick={exportCsv}
+              disabled={filtered.length === 0}
+              className="text-sm px-4 py-2 rounded-lg border border-black/10 hover:bg-gray-light disabled:opacity-50"
+            >
+              Export CSV
+            </button>
           </div>
         </div>
 
         {loading ? (
-          <p className="p-8 text-center text-gray-muted">Loading students…</p>
+          <p className="p-8 text-center text-gray-muted">Loading…</p>
         ) : error ? (
           <p className="p-8 text-center text-red-600">{error}</p>
         ) : filtered.length === 0 ? (
           <p className="p-8 text-center text-gray-muted">
-            No enrollments yet. They appear here after a successful payment.
+            No applications yet. They appear when someone completes the checkout form.
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[960px]">
               <thead>
                 <tr className="text-xs uppercase tracking-wider text-gray-muted border-b border-black/5">
-                  <th className="py-3 px-6 font-semibold">Name</th>
+                  <th className="py-3 px-4 font-semibold">Name</th>
                   <th className="py-3 pr-4 font-semibold">Email</th>
+                  <th className="py-3 pr-4 font-semibold">Phone</th>
+                  <th className="py-3 pr-4 font-semibold">Region</th>
+                  <th className="py-3 pr-4 font-semibold">Country</th>
                   <th className="py-3 pr-4 font-semibold">Course</th>
-                  <th className="py-3 pr-4 font-semibold">Enrolled</th>
-                  <th className="py-3 px-6 font-semibold">Email</th>
+                  <th className="py-3 pr-4 font-semibold">Status</th>
+                  <th className="py-3 pr-4 font-semibold">Date</th>
+                  <th className="py-3 px-4 font-semibold">Receipt email</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((row) => (
                   <tr
                     key={row.reference}
-                    className={`border-b border-black/5 hover:bg-gray-light/50 cursor-pointer ${
-                      selectedReference === row.reference ? "bg-purple/5" : ""
-                    }`}
-                    onClick={() =>
+                    className={`border-b border-black/5 hover:bg-gray-light/50 ${
+                      row.status === "enrolled" ? "cursor-pointer" : ""
+                    } ${selectedReference === row.reference ? "bg-purple/5" : ""}`}
+                    onClick={() => {
+                      if (row.status !== "enrolled") return;
                       setSelectedReference((prev) =>
                         prev === row.reference ? "" : row.reference
-                      )
-                    }
+                      );
+                    }}
                   >
-                    <td className="py-3 px-6 font-medium">{row.name}</td>
+                    <td className="py-3 px-4 font-medium">{row.name}</td>
                     <td className="py-3 pr-4">
                       <a
                         href={`mailto:${row.email}`}
@@ -190,15 +271,35 @@ export default function AdminStudentsPanel({ courses }: Props) {
                         {row.email}
                       </a>
                     </td>
-                    <td className="py-3 pr-4">{row.courseTitle}</td>
-                    <td className="py-3 pr-4 text-gray-muted whitespace-nowrap">
-                      {formatDate(row.enrolledAt)}
+                    <td className="py-3 pr-4 whitespace-nowrap">{row.phone || "—"}</td>
+                    <td className="py-3 pr-4">{row.region || "—"}</td>
+                    <td className="py-3 pr-4 whitespace-nowrap">
+                      {row.countryName ?? getCountryByCode(row.countryCode)?.name ?? row.countryCode}
                     </td>
-                    <td className="py-3 px-6">
-                      {row.confirmationEmailSentAt ? (
-                        <span className="text-green-700 text-xs font-semibold">Sent</span>
+                    <td className="py-3 pr-4">{row.courseTitle}</td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                          row.status === "enrolled"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {row.status === "enrolled" ? "Enrolled" : "Payment pending"}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-gray-muted whitespace-nowrap">
+                      {formatDate(row.enrolledAt ?? row.startedAt ?? 0)}
+                    </td>
+                    <td className="py-3 px-4">
+                      {row.status === "enrolled" ? (
+                        row.confirmationEmailSentAt ? (
+                          <span className="text-green-700 text-xs font-semibold">Sent</span>
+                        ) : (
+                          <span className="text-amber-700 text-xs">Not sent</span>
+                        )
                       ) : (
-                        <span className="text-amber-700 text-xs">Not sent</span>
+                        <span className="text-gray-muted text-xs">—</span>
                       )}
                     </td>
                   </tr>
@@ -210,13 +311,13 @@ export default function AdminStudentsPanel({ courses }: Props) {
       </section>
 
       <section className="rounded-2xl bg-white border border-black/5 shadow-sm p-6">
-        <h2 className="text-lg font-bold mb-1">Email students</h2>
+        <h2 className="text-lg font-bold mb-1">Email enrolled students</h2>
         <p className="text-sm text-gray-muted mb-6">
           {selectedReference
-            ? "Sending to the selected student only."
+            ? "Sending to the selected student."
             : filterCourse
-              ? `Sending to all students in this course (${filtered.length}).`
-              : "Filter by course or click a row to email one student."}
+              ? `Sending to enrolled students in this course.`
+              : "Filter by course or click an enrolled row to email one person."}
         </p>
 
         <form onSubmit={handleSend} className="space-y-4 max-w-2xl">
@@ -229,7 +330,6 @@ export default function AdminStudentsPanel({ courses }: Props) {
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="e.g. New module added to your course"
               className="w-full border border-black/10 rounded-lg px-3 py-2 text-sm"
             />
           </div>
@@ -242,7 +342,6 @@ export default function AdminStudentsPanel({ courses }: Props) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={6}
-              placeholder="Write your message. Line breaks are preserved."
               className="w-full border border-black/10 rounded-lg px-3 py-2 text-sm resize-y"
             />
           </div>
@@ -272,12 +371,6 @@ export default function AdminStudentsPanel({ courses }: Props) {
             </p>
           )}
         </form>
-
-        <p className="text-xs text-gray-muted mt-6 border-t border-black/5 pt-4">
-          Requires <code className="font-mono bg-black/5 px-1 rounded">RESEND_API_KEY</code> and{" "}
-          <code className="font-mono bg-black/5 px-1 rounded">EMAIL_FROM</code> in env vars. Use a
-          verified domain in Resend for production.
-        </p>
       </section>
     </div>
   );

@@ -12,6 +12,8 @@ export type PendingPayment = {
   name?: string;
   email?: string;
   phone?: string;
+  region?: string;
+  countryCode?: string;
 };
 
 const CACHE_KEY = "pending-payments";
@@ -21,6 +23,12 @@ export async function getPendingPayment(reference: string): Promise<PendingPayme
   const remote = await loadPendingPaymentRemote(reference);
   if (remote) return remote;
   return findPaymentRecord<PendingPayment>(CACHE_KEY, FILE_NAME, reference);
+}
+
+export async function listAllPendingPayments(): Promise<PendingPayment[]> {
+  return readPaymentRecords<PendingPayment>(CACHE_KEY, FILE_NAME).sort(
+    (a, b) => b.createdAt - a.createdAt
+  );
 }
 
 export async function recordPendingPayment(payment: PendingPayment): Promise<void> {
