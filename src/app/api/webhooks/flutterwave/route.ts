@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     (event.data?.status === "successful" || event.data?.status === "success");
 
   if (isSuccessful && reference && courseSlug) {
-    recordConfirmedPayment({
+    await recordConfirmedPayment({
       reference,
       provider: "flutterwave" as PaymentProvider,
       courseSlug,

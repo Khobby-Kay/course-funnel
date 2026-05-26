@@ -113,6 +113,9 @@ export const PAYMENT_OPTIONS = [
   { id: "card" as const, label: "Visa / Mastercard", hint: "Debit or credit card" },
 ];
 
+/** Active at checkout — Moolre first; add others when configured. */
+export const ACTIVE_PAYMENT_OPTIONS = PAYMENT_OPTIONS.filter((o) => o.id === "moolre");
+
 /** @deprecated Use PAYMENT_OPTIONS */
 export const PAYMENT_METHODS = PAYMENT_OPTIONS.map((o) => o.label);
 

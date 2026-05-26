@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   if (event.event === "charge.success" && event.data?.reference && event.data.status === "success") {
     const courseSlug = extractCourseSlug(event.data);
     if (courseSlug) {
-      recordConfirmedPayment({
+      await recordConfirmedPayment({
         reference: event.data.reference,
         provider: "paystack" as PaymentProvider,
         courseSlug,

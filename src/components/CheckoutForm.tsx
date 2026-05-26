@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import { PAYMENT_OPTIONS } from "@/lib/constants";
+import { ACTIVE_PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
 import type { PaymentProvider } from "@/lib/payments/types";
 
@@ -11,10 +11,12 @@ type CheckoutFormProps = {
   data: CoursePageData;
 };
 
+const MOOLRE_PROVIDER: PaymentProvider = "moolre";
+
 export default function CheckoutForm({ data }: CheckoutFormProps) {
   const { course, ctas, valueStack, checkoutIncluded, landingPath, badge, brandName } = data;
+  const paymentOption = ACTIVE_PAYMENT_OPTIONS[0];
 
-  const [provider, setProvider] = useState<PaymentProvider>(PAYMENT_OPTIONS[0].id);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -28,7 +30,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
       const response = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, provider, courseSlug: data.slug }),
+        body: JSON.stringify({ ...form, provider: MOOLRE_PROVIDER, courseSlug: data.slug }),
       });
 
       const result = await response.json();
@@ -158,7 +160,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-medium mb-1 block">Phone Number (MoMo)</span>
+                <span className="text-sm font-medium mb-1 block">MoMo Phone Number</span>
                 <input
                   type="tel"
                   name="phone"
@@ -172,31 +174,16 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
               </label>
             </fieldset>
 
-            <fieldset className="mb-6 border-0 p-0 m-0">
-              <legend className="text-sm font-medium mb-3">Payment Method</legend>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {PAYMENT_OPTIONS.map((option) => (
-                  <li key={option.id}>
-                    <button
-                      type="button"
-                      onClick={() => setProvider(option.id)}
-                      aria-pressed={provider === option.id}
-                      className={`w-full px-3 py-3 rounded-xl text-left border transition-colors ${
-                        provider === option.id
-                          ? "border-purple bg-purple/10 text-purple"
-                          : "border-black/10 hover:border-purple/30"
-                      }`}
-                    >
-                      <span className="block font-semibold text-sm">{option.label}</span>
-                      <span className="block text-xs opacity-70 mt-0.5">{option.hint}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </fieldset>
+            <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4">
+              <p className="text-sm font-semibold text-purple">{paymentOption?.label ?? "Mobile Money"}</p>
+              <p className="text-xs text-gray-muted mt-1">
+                {paymentOption?.hint ?? "MTN · Telecel · AT"} — you&apos;ll approve the payment on your phone via
+                Moolre.
+              </p>
+            </section>
 
             <Button type="submit" size="lg" className="w-full mb-4" disabled={isSubmitting}>
-              {isSubmitting ? "Redirecting to payment…" : `${ctas.checkout} →`}
+              {isSubmitting ? "Redirecting to Moolre…" : `Pay ${course.currency} ${course.price} with MoMo →`}
             </Button>
 
             <p className="text-center text-xs text-gray-muted mb-4">
@@ -206,8 +193,8 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
             </p>
 
             <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-muted">
-              <li className="flex items-center gap-1">🔒 Secure payment</li>
-              <li className="flex items-center gap-1">🛡️ SSL encrypted</li>
+              <li className="flex items-center gap-1">🔒 Secure Moolre checkout</li>
+              <li className="flex items-center gap-1">📱 MTN · Telecel · AT Money</li>
               <li className="flex items-center gap-1">↩️ Money-back guarantee</li>
             </ul>
           </form>

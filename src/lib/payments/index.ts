@@ -26,7 +26,7 @@ export async function initializePayment(
 
   if (isDemoMode()) {
     const reference = `cf-${input.courseSlug.replace(/[^a-z0-9-]/gi, "-").replace(/-+/g, "-").toLowerCase()}-demo-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-    recordPendingPayment({
+    await recordPendingPayment({
       reference,
       courseSlug: input.courseSlug,
       provider: "demo",
@@ -55,7 +55,7 @@ export async function initializePayment(
       result = await initializePaystack(input, pricing);
   }
 
-  recordPendingPayment({
+  await recordPendingPayment({
     reference: result.reference,
     courseSlug: input.courseSlug,
     provider: result.provider,

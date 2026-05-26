@@ -1,5 +1,11 @@
-import type { CoursePricing, InitializePaymentInput, InitializePaymentResult } from "../types";
-import { createPaymentReference, getAppUrl } from "../utils";
+import type { CoursePricing, InitializePaymentInput, InitializePaymentResult, VerifyPaymentResult } from "../types";
+import {
+  isMoolrePaid,
+  parseMoolreAmount,
+  parseMoolreCourseSlug,
+  type MoolreStatusPayload,
+} from "../moolre-status";
+import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
 
 type MoolreLinkResponse = {
   status: number;
@@ -53,7 +59,7 @@ export async function initializeMoolre(
       email: input.email,
       externalref: reference,
       callback: `${appUrl}/api/webhooks/moolre`,
-      redirect: `${appUrl}/success?reference=${reference}&provider=moolre&course=${pricing.slug}`,
+      redirect: `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}`,
       reusable: "0",
       currency: pricing.currency,
       accountnumber: accountNumber,
@@ -75,13 +81,31 @@ export async function initializeMoolre(
 
   return {
     checkoutUrl,
-    // Keep our externalref — matches redirect URL and Payment Status id (idtype=1)
     reference,
     provider: "moolre",
   };
 }
 
-export async function verifyMoolre(reference: string) {
+function buildVerifyResult(
+  reference: string,
+  payload: MoolreStatusPayload
+): VerifyPaymentResult {
+  const paid = isMoolrePaid(payload);
+  const courseSlug =
+    parseMoolreCourseSlug(payload) || parseCourseSlugFromReference(reference) || undefined;
+
+  return {
+    success: paid,
+    reference,
+    provider: "moolre",
+    courseSlug,
+    amount: parseMoolreAmount(payload),
+    currency: typeof payload.data?.currency === "string" ? payload.data.currency : undefined,
+    customerEmail: undefined,
+  };
+}
+
+export async function verifyMoolre(reference: string): Promise<VerifyPaymentResult> {
   const apiUser = process.env.MOOLRE_API_USER;
   if (!apiUser) throw new Error("Moolre is not configured");
 
@@ -96,37 +120,25 @@ export async function verifyMoolre(reference: string) {
     }),
   });
 
-  let payload: {
-    status?: number;
-    data?: { txstatus?: number; metadata?: Record<string, unknown> };
-    metadata?: Record<string, unknown>;
-  };
+  let payload: MoolreStatusPayload;
   try {
     payload = await response.json();
   } catch {
     return {
       success: false,
       reference,
-      provider: "moolre" as const,
+      provider: "moolre",
     };
   }
 
-  const paid = payload?.status === 1 && payload?.data?.txstatus === 1;
-  const meta = payload?.data?.metadata ?? payload?.metadata;
-  const courseSlug =
-    typeof meta?.course_slug === "string"
-      ? meta.course_slug.trim()
-      : typeof meta?.courseSlug === "string"
-        ? meta.courseSlug.trim()
-        : undefined;
+  return buildVerifyResult(reference, payload);
+}
 
-  return {
-    success: Boolean(paid),
-    reference,
-    provider: "moolre" as const,
-    courseSlug: courseSlug || undefined,
-    amount: undefined,
-    currency: undefined,
-    customerEmail: undefined,
-  };
+/** Validate paid amount matches course price (major units, e.g. GHS). */
+export function moolreAmountMatchesPrice(
+  paidAmount: number | undefined,
+  expectedPrice: number
+): boolean {
+  if (paidAmount === undefined) return true;
+  return Math.abs(paidAmount - expectedPrice) < 0.01;
 }

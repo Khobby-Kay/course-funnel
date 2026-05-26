@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { verifyMoolre } from "@/lib/payments/providers/moolre";
+import { isMoolrePaid, parseMoolreCourseSlug } from "@/lib/payments/moolre-status";
 import { recordConfirmedPayment } from "@/lib/payments/confirmed-store";
 import type { PaymentProvider } from "@/lib/payments/types";
 import { parseCourseSlugFromReference } from "@/lib/payments/utils";
@@ -8,8 +10,10 @@ type MoolreWebhook = {
   code?: string;
   message?: string;
   data?: {
-    txstatus?: number;
+    txstatus?: number | string;
     externalref?: string;
+    amount?: number | string;
+    currency?: string;
     metadata?: {
       course_slug?: string;
       courseSlug?: string;
@@ -31,22 +35,34 @@ export async function POST(request: Request) {
   }
 
   const reference = payload.data?.externalref ?? payload.externalref;
-  const meta = payload.data?.metadata ?? payload.metadata;
-  const courseSlug =
-    (typeof meta?.course_slug === "string" ? meta.course_slug.trim() : undefined) ||
-    (typeof meta?.courseSlug === "string" ? meta.courseSlug.trim() : undefined) ||
-    (reference ? parseCourseSlugFromReference(reference) : null) ||
-    undefined;
-  const paid = payload.status === 1 || payload.data?.txstatus === 1;
-
-  if (paid && reference && courseSlug) {
-    recordConfirmedPayment({
-      reference,
-      provider: "moolre" as PaymentProvider,
-      courseSlug,
-      confirmedAt: Date.now(),
-    });
+  if (!reference) {
+    return NextResponse.json({ received: true, skipped: "no reference" });
   }
 
-  return NextResponse.json({ received: true });
+  if (!isMoolrePaid(payload)) {
+    return NextResponse.json({ received: true, skipped: "not paid" });
+  }
+
+  const verified = await verifyMoolre(reference);
+  if (!verified.success) {
+    return NextResponse.json({ received: true, skipped: "verify failed" });
+  }
+
+  const courseSlug =
+    verified.courseSlug ||
+    parseMoolreCourseSlug(payload) ||
+    parseCourseSlugFromReference(reference);
+
+  if (!courseSlug) {
+    return NextResponse.json({ received: true, skipped: "no course slug" });
+  }
+
+  await recordConfirmedPayment({
+    reference,
+    provider: "moolre" as PaymentProvider,
+    courseSlug,
+    confirmedAt: Date.now(),
+  });
+
+  return NextResponse.json({ received: true, confirmed: true });
 }

@@ -21,6 +21,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (provider !== "moolre") {
+      return NextResponse.json(
+        { error: "Only Moolre Mobile Money is enabled right now. PayStack and others coming soon." },
+        { status: 400 }
+      );
+    }
+
     const course = await getCourseBySlug(courseSlug.trim());
     if (!course || course.status !== "published") {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });

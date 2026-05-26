@@ -9,6 +9,7 @@ import {
 import { getCourseBySlug } from "@/lib/courses/server";
 import { getConfirmedPayment, recordConfirmedPayment } from "@/lib/payments/confirmed-store";
 import { verifyPayment } from "@/lib/payments";
+import { moolreAmountMatchesPrice } from "@/lib/payments/providers/moolre";
 import { getPendingPayment } from "@/lib/payments/pending-store";
 import type { PaymentProvider } from "@/lib/payments/types";
 import { parseCourseSlugFromReference } from "@/lib/payments/utils";
@@ -34,10 +35,10 @@ export async function resolveCourseSlugForPayment(
   provider: PaymentProvider | "demo",
   requestedSlug?: string
 ): Promise<string | null> {
-  const confirmed = getConfirmedPayment(reference);
+  const confirmed = await getConfirmedPayment(reference);
   if (confirmed?.courseSlug) return confirmed.courseSlug;
 
-  const pending = getPendingPayment(reference);
+  const pending = await getPendingPayment(reference);
   if (pending?.courseSlug) return pending.courseSlug;
 
   const fromReference = parseCourseSlugFromReference(reference);
@@ -60,14 +61,13 @@ export async function confirmPayment(
   provider: PaymentProvider | "demo",
   courseSlug: string
 ): Promise<boolean> {
-  // Demo checkout only — never grant real providers without verification
   if (isDemoPayment(reference, provider)) {
     return process.env.PAYMENTS_DEMO_MODE === "true";
   }
 
-  const stored = getConfirmedPayment(reference);
-  if (stored?.courseSlug === courseSlug) {
-    return true;
+  const pending = await getPendingPayment(reference);
+  if (pending && pending.courseSlug !== courseSlug) {
+    return false;
   }
 
   const verified = await verifyPayment(reference, provider);
@@ -75,11 +75,22 @@ export async function confirmPayment(
     return false;
   }
 
-  if (verified.courseSlug && verified.courseSlug !== courseSlug) {
+  const resolvedSlug =
+    verified.courseSlug || parseCourseSlugFromReference(reference) || pending?.courseSlug;
+
+  if (resolvedSlug && resolvedSlug !== courseSlug) {
     return false;
   }
 
-  recordConfirmedPayment({
+  const course = await getCourseBySlug(courseSlug);
+  if (course && provider === "moolre") {
+    const expectedPrice = course.marketing.course.price;
+    if (!moolreAmountMatchesPrice(verified.amount, expectedPrice)) {
+      return false;
+    }
+  }
+
+  await recordConfirmedPayment({
     reference,
     provider,
     courseSlug,
@@ -135,7 +146,7 @@ export async function grantAccessAfterPayment(
 
   const token = await createAccessToken(existing, entitlement);
 
-  recordConfirmedPayment({
+  await recordConfirmedPayment({
     reference,
     provider,
     courseSlug,

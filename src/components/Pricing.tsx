@@ -1,6 +1,6 @@
 import Button from "@/components/ui/Button";
 import CountdownTimer from "@/components/CountdownTimer";
-import { PAYMENT_OPTIONS } from "@/lib/constants";
+import { ACTIVE_PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
 
 type PricingProps = { data: CoursePageData };
@@ -73,7 +73,7 @@ export default function Pricing({ data }: PricingProps) {
             </p>
 
             <ul className="flex flex-wrap gap-2 justify-center">
-              {PAYMENT_OPTIONS.map((method) => (
+              {ACTIVE_PAYMENT_OPTIONS.map((method) => (
                 <li
                   key={method.id}
                   className="px-3 py-1.5 rounded-lg bg-white/10 text-white/70 text-xs font-medium"

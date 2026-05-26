@@ -47,29 +47,45 @@ function SuccessContent() {
     if (!reference || !provider) return;
 
     const grantAccess = async () => {
-      try {
-        const grantRes = await fetch("/api/access/grant", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            reference,
-            provider,
-            courseSlug: courseFromUrl || undefined,
-          }),
-        });
+      const maxAttempts = provider === "moolre" ? 8 : 1;
+      const delayMs = 2000;
 
-        const data = (await grantRes.json().catch(() => ({}))) as GrantResponse;
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const grantRes = await fetch("/api/access/grant", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              reference,
+              provider,
+              courseSlug: courseFromUrl || undefined,
+            }),
+          });
 
-        if (!grantRes.ok || !data.courseSlug) {
+          const data = (await grantRes.json().catch(() => ({}))) as GrantResponse;
+
+          if (grantRes.ok && data.courseSlug) {
+            setGrantedCourseSlug(data.courseSlug);
+            setStatus("success");
+            return;
+          }
+
+          if (attempt < maxAttempts && provider === "moolre") {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            continue;
+          }
+
+          setStatus("failed");
+          return;
+        } catch {
+          if (attempt < maxAttempts && provider === "moolre") {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            continue;
+          }
           setStatus("failed");
           return;
         }
-
-        setGrantedCourseSlug(data.courseSlug);
-        setStatus("success");
-      } catch {
-        setStatus("failed");
       }
     };
 
@@ -95,6 +111,7 @@ function SuccessContent() {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center px-4">
         <p className="text-white/70">Confirming your payment and unlocking your course…</p>
+        <p className="text-white/40 text-sm mt-2">MoMo payments can take a few seconds to confirm.</p>
       </main>
     );
   }
