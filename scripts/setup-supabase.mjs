@@ -40,9 +40,13 @@ if (!url || !serviceKey) {
   process.exit(1);
 }
 
-const BUCKETS = ["course-videos", "course-data"];
+const BUCKETS = [
+  { id: "course-videos", public: false },
+  { id: "course-data", public: false },
+  { id: "course-marketing", public: true },
+];
 
-async function ensureBucket(bucketId) {
+async function ensureBucket(bucketId, isPublic) {
   const res = await fetch(`${url}/storage/v1/bucket`, {
     method: "POST",
     headers: {
@@ -53,18 +57,21 @@ async function ensureBucket(bucketId) {
     body: JSON.stringify({
       id: bucketId,
       name: bucketId,
-      public: false,
+      public: isPublic,
     }),
   });
 
   const text = await res.text();
   if (res.ok) {
-    console.log(`✓ Bucket "${bucketId}" created (private).`);
+    console.log(`✓ Bucket "${bucketId}" created (${isPublic ? "public" : "private"}).`);
     return;
   }
 
   if (res.status === 409 || text.toLowerCase().includes("already exists")) {
     console.log(`✓ Bucket "${bucketId}" already exists.`);
+    if (isPublic) {
+      await ensureBucketPublic(bucketId);
+    }
     return;
   }
 
@@ -72,11 +79,37 @@ async function ensureBucket(bucketId) {
   process.exit(1);
 }
 
+async function ensureBucketPublic(bucketId) {
+  const res = await fetch(`${url}/storage/v1/bucket/${bucketId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${serviceKey}`,
+      apikey: serviceKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: bucketId,
+      name: bucketId,
+      public: true,
+    }),
+  });
+
+  if (res.ok) {
+    console.log(`✓ Bucket "${bucketId}" set to public.`);
+    return;
+  }
+
+  const text = await res.text();
+  console.warn(`Could not update "${bucketId}" to public (${res.status}): ${text}`);
+  console.warn(`  → In Supabase Dashboard → Storage → ${bucketId}, enable "Public bucket".`);
+}
+
 async function main() {
   console.log("Supabase URL:", url);
   for (const bucket of BUCKETS) {
-    await ensureBucket(bucket);
+    await ensureBucket(bucket.id, bucket.public);
   }
+  console.log("\nDone. Marketing images upload to the public course-marketing bucket.");
 }
 
 main().catch((err) => {

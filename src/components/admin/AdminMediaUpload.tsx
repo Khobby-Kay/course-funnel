@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { isPublicMarketingField } from "@/lib/media/constants";
 import type { MediaUploadField } from "@/lib/media/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { COURSE_VIDEOS_BUCKET } from "@/lib/supabase/config";
@@ -27,7 +28,7 @@ type UploadJson = {
   bucket?: string;
 };
 
-function canDirectVideoUpload(): boolean {
+function canDirectSupabaseUpload(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
@@ -66,9 +67,10 @@ export default function AdminMediaUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const uploadLessonVideoDirect = async (file: File) => {
-    if (!lessonId) throw new Error("lessonId is required for lesson videos");
-
+  const uploadDirectToSupabase = async (
+    file: File,
+    prepareBody: Record<string, string | number>
+  ) => {
     const mime = file.type || "application/octet-stream";
 
     const prepareResponse = await fetch("/api/admin/media/upload-url", {
@@ -77,9 +79,9 @@ export default function AdminMediaUpload({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         courseSlug,
-        lessonId,
         mime,
         size: file.size,
+        ...prepareBody,
       }),
     });
 
@@ -101,6 +103,14 @@ export default function AdminMediaUpload({
       throw new Error(uploadErrorResult.message);
     }
 
+    return prepare;
+  };
+
+  const uploadLessonVideoDirect = async (file: File) => {
+    if (!lessonId) throw new Error("lessonId is required for lesson videos");
+
+    const prepare = await uploadDirectToSupabase(file, { lessonId });
+
     const completeResponse = await fetch("/api/admin/media/complete", {
       method: "POST",
       credentials: "include",
@@ -116,6 +126,29 @@ export default function AdminMediaUpload({
     if (!completeResponse.ok) throw uploadError(completeResponse, complete, completeText);
 
     onUploaded({ videoPath: complete?.videoPath ?? prepare.storagePath });
+  };
+
+  const uploadMarketingDirect = async (file: File) => {
+    const prepare = await uploadDirectToSupabase(file, { field });
+
+    const completeResponse = await fetch("/api/admin/media/complete", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        courseSlug,
+        field,
+        storagePath: prepare.storagePath,
+      }),
+    });
+
+    const { data: complete, text: completeText } = await readUploadResponse(completeResponse);
+    if (!completeResponse.ok) throw uploadError(completeResponse, complete, completeText);
+
+    onUploaded({
+      url: complete?.url,
+      media: complete?.media,
+    });
   };
 
   const uploadViaApi = async (file: File) => {
@@ -146,8 +179,14 @@ export default function AdminMediaUpload({
     setUploading(true);
 
     try {
-      if (field === "lessonVideo" && canDirectVideoUpload()) {
-        await uploadLessonVideoDirect(file);
+      if (canDirectSupabaseUpload()) {
+        if (field === "lessonVideo") {
+          await uploadLessonVideoDirect(file);
+        } else if (isPublicMarketingField(field)) {
+          await uploadMarketingDirect(file);
+        } else {
+          await uploadViaApi(file);
+        }
       } else {
         await uploadViaApi(file);
       }

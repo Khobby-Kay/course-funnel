@@ -1,4 +1,5 @@
 export const COURSE_VIDEOS_BUCKET = "course-videos";
+export const COURSE_MARKETING_BUCKET = "course-marketing";
 
 /** Signed URL lifetime — short-lived so links cannot be shared long-term. */
 export const VIDEO_SIGNED_URL_TTL_SECONDS = 60 * 60;

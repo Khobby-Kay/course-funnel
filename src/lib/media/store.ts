@@ -60,7 +60,8 @@ export function savePublicMedia(
 
   const base = path.join(PUBLIC_MEDIA_ROOT, slug, "images");
   let filename: string;
-  if (field === "instructorPhoto") filename = `instructor${ext}`;
+  if (field === "coverImage") filename = `cover${ext}`;
+  else if (field === "instructorPhoto") filename = `instructor${ext}`;
   else if (field === "previewVideoPoster") filename = `preview-poster${ext}`;
   else if (field.startsWith("screenshot-")) filename = `screenshot-${field.split("-")[1]}${ext}`;
   else throw new Error("Invalid public media field");

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { loadCourseBySlug, saveCourse } from "@/lib/courses/store";
-import type { CourseMedia } from "@/lib/courses/types";
 import { lessonVideoStoragePath } from "@/lib/media/paths";
+import { isPublicMarketingField } from "@/lib/media/constants";
+import {
+  applyMarketingMediaUrl,
+  marketingMediaStoragePath,
+  marketingUploadKind,
+} from "@/lib/media/marketing";
 import {
   savePrivateLessonVideo,
   savePublicMedia,
@@ -15,17 +20,12 @@ import {
   supabaseRequiredForUploadsMessage,
 } from "@/lib/runtime/filesystem";
 import { getSupabaseAdminOrNull } from "@/lib/supabase/admin";
-import { COURSE_VIDEOS_BUCKET, isSupabaseConfigured } from "@/lib/supabase/config";
-
-const PUBLIC_FIELDS = new Set<MediaUploadField>([
-  "coverImage",
-  "instructorPhoto",
-  "previewVideo",
-  "previewVideoPoster",
-  "screenshot-0",
-  "screenshot-1",
-  "screenshot-2",
-]);
+import {
+  COURSE_MARKETING_BUCKET,
+  COURSE_VIDEOS_BUCKET,
+  isSupabaseConfigured,
+} from "@/lib/supabase/config";
+import { getMarketingPublicUrl } from "@/lib/supabase/public-url";
 
 export async function POST(request: Request) {
   try {
@@ -98,46 +98,51 @@ export async function POST(request: Request) {
       });
     }
 
-    if (!PUBLIC_FIELDS.has(field)) {
+    if (!isPublicMarketingField(field)) {
       return NextResponse.json({ error: "Invalid upload field" }, { status: 400 });
     }
 
-    if (!canWritePublicMedia()) {
+    const uploadKind = marketingUploadKind(field);
+    validateUpload(mime, buffer.length, uploadKind);
+
+    const supabase = getSupabaseAdminOrNull();
+    let publicUrl: string;
+    let storage: "supabase" | "local";
+
+    if (supabase) {
+      const storagePath = marketingMediaStoragePath(courseSlug, field, mime);
+      const { error } = await supabase.storage
+        .from(COURSE_MARKETING_BUCKET)
+        .upload(storagePath, buffer, { contentType: mime, upsert: true });
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 502 });
+      }
+      publicUrl = getMarketingPublicUrl(storagePath);
+      storage = "supabase";
+    } else if (canWritePublicMedia()) {
+      const saved = savePublicMedia(courseSlug, field, buffer, mime);
+      publicUrl = saved.publicUrl;
+      storage = "local";
+    } else {
       return NextResponse.json(
         {
-          error:
-            "Marketing images cannot be saved on the live site (read-only disk). " +
-            "Upload images while running locally, or commit files under public/course-media/.",
+          error: isSupabaseConfigured()
+            ? "Supabase client failed to initialize. Check SUPABASE_SERVICE_ROLE_KEY on Vercel."
+            : supabaseRequiredForUploadsMessage(),
         },
         { status: 503 }
       );
     }
 
-    const isVideo = field === "previewVideo";
-    validateUpload(mime, buffer.length, isVideo ? "video" : "image");
-    const saved = savePublicMedia(courseSlug, field, buffer, mime);
-
-    const media: CourseMedia = { ...(course.media ?? {}) };
-
-    if (field === "coverImage") media.coverImage = saved.publicUrl;
-    else if (field === "instructorPhoto") media.instructorPhoto = saved.publicUrl;
-    else if (field === "previewVideo") media.previewVideoUrl = saved.publicUrl;
-    else if (field === "previewVideoPoster") media.previewVideoPoster = saved.publicUrl;
-    else if (field.startsWith("screenshot-")) {
-      const index = Number(field.split("-")[1]);
-      const shots = [...(media.screenshots ?? ["", "", ""])];
-      while (shots.length < 3) shots.push("");
-      shots[index] = saved.publicUrl;
-      media.screenshots = shots;
-    }
-
+    const media = applyMarketingMediaUrl(course.media, field, publicUrl);
     await saveCourse({ ...course, media });
 
     return NextResponse.json({
       ok: true,
       field,
-      url: saved.publicUrl,
+      url: publicUrl,
       media,
+      storage,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Upload failed";

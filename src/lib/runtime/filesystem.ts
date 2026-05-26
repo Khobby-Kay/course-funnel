@@ -33,7 +33,7 @@ export function canWritePublicMedia(): boolean {
 export function supabaseRequiredForUploadsMessage(): string {
   return (
     "File uploads on the live site use Supabase Storage, not disk. " +
-    "Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel (same values as .env.local), " +
-    "run npm run setup:supabase once, then redeploy."
+    "Add NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY in Vercel, " +
+    "run npm run setup:supabase once (creates the course-marketing bucket), then redeploy."
   );
 }
