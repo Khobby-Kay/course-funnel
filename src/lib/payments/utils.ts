@@ -33,6 +33,25 @@ export function hasAnyPaymentProvider(): boolean {
   );
 }
 
+function envTrim(key: string): string {
+  return process.env[key]?.trim() ?? "";
+}
+
+/** Returns missing Moolre env var names (empty = configured). */
+export function getMoolreConfigIssues(): string[] {
+  const issues: string[] = [];
+  if (!envTrim("MOOLRE_API_USER")) issues.push("MOOLRE_API_USER");
+  if (!envTrim("MOOLRE_ACCOUNT_NUMBER")) issues.push("MOOLRE_ACCOUNT_NUMBER");
+  if (envTrim("MOOLRE_SANDBOX") !== "true" && !envTrim("MOOLRE_PUBLIC_KEY")) {
+    issues.push("MOOLRE_PUBLIC_KEY");
+  }
+  return issues;
+}
+
+export function isMoolreConfigured(): boolean {
+  return getMoolreConfigIssues().length === 0;
+}
+
 export function amountToMinorUnits(amount: number): number {
   return Math.round(amount * 100);
 }

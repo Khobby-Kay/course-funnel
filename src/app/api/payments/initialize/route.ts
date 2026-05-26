@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCourseBySlug } from "@/lib/courses/server";
 import { initializePayment, isProviderConfigured } from "@/lib/payments";
+import { getMoolreConfigIssues } from "@/lib/payments/utils";
 import type { PaymentProvider } from "@/lib/payments/types";
 
 type Body = {
@@ -26,8 +27,14 @@ export async function POST(request: Request) {
     }
 
     if (!isProviderConfigured(provider)) {
+      const missing =
+        provider === "moolre" ? getMoolreConfigIssues() : [];
+      const hint =
+        missing.length > 0
+          ? ` Missing: ${missing.join(", ")}. Add to .env.local and restart npm run dev, or to Vercel → Settings → Environment Variables and redeploy.`
+          : " Add API keys to .env.local (local) or Vercel env vars (production).";
       return NextResponse.json(
-        { error: `${provider} is not configured. Add API keys to .env.local` },
+        { error: `${provider} is not configured.${hint}` },
         { status: 503 }
       );
     }

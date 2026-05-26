@@ -5,7 +5,7 @@ import { initializeFlutterwave, verifyFlutterwave } from "./providers/flutterwav
 import { initializeMoolre, verifyMoolre } from "./providers/moolre";
 import { initializePaystack, verifyPaystack } from "./providers/paystack";
 import { recordPendingPayment } from "./pending-store";
-import { getAppUrl, isDemoMode } from "./utils";
+import { getAppUrl, isDemoMode, isMoolreConfigured } from "./utils";
 
 export function resolveCoursePricing(courseSlug: string): CoursePricing {
   const course = loadCourseBySlug(courseSlug);
@@ -99,7 +99,7 @@ export function isProviderConfigured(provider: PaymentProvider): boolean {
 
   switch (provider) {
     case "moolre":
-      return Boolean(process.env.MOOLRE_API_USER && process.env.MOOLRE_ACCOUNT_NUMBER);
+      return isMoolreConfigured();
     case "flutterwave":
       return Boolean(process.env.FLUTTERWAVE_SECRET_KEY);
     case "card":
