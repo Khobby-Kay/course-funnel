@@ -7,7 +7,7 @@ import {
 } from "../moolre-status";
 import { assertMoolreCurrency } from "../moolre-currency";
 import { isMoolrePromptSent, moolreErrorMessage } from "../moolre-errors";
-import { moolreNetworkLabel, normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone } from "../moolre-phone";
+import { normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone } from "../moolre-phone";
 import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
 
 type MoolreApiResponse = {
@@ -102,21 +102,11 @@ async function initializeMoolreDirectMomo(params: {
     body: JSON.stringify({
       type: 1,
       amount: String(params.pricing.price),
-      email: params.input.email,
       externalref: params.reference,
-      callback: `${params.appUrl}/api/webhooks/moolre`,
-      redirect: params.redirect,
       currency,
       accountnumber: params.accountNumber,
       payer,
-      channel,
-      metadata: {
-        name: params.input.name,
-        phone: payer,
-        course: params.pricing.title,
-        course_slug: params.pricing.slug,
-        network: moolreNetworkLabel(payer),
-      },
+      channel: String(channel),
     }),
   });
 
@@ -214,7 +204,7 @@ export async function verifyMoolre(reference: string): Promise<VerifyPaymentResu
     headers: getMoolreHeaders(),
     body: JSON.stringify({
       type: 1,
-      idtype: 1,
+      idtype: "1",
       id: reference,
       accountnumber: process.env.MOOLRE_ACCOUNT_NUMBER,
     }),

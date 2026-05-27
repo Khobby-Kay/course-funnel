@@ -3,6 +3,8 @@ import "server-only";
 import type { PaymentProvider } from "./types";
 import { findPaymentRecord, readPaymentRecords, writePaymentRecords } from "./json-store";
 import { loadPendingPaymentRemote, savePendingPaymentRemote } from "./remote-store";
+import { isServerlessDeploy } from "@/lib/runtime/filesystem";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export type PendingPayment = {
   reference: string;
@@ -38,9 +40,14 @@ export async function recordPendingPayment(payment: PendingPayment): Promise<voi
   entries.push(payment);
   writePaymentRecords(CACHE_KEY, FILE_NAME, entries);
 
-  try {
+  if (isSupabaseConfigured()) {
     await savePendingPaymentRemote(payment);
-  } catch {
-    // Local/memory store still updated
+    return;
+  }
+
+  if (isServerlessDeploy()) {
+    throw new Error(
+      "Payment records cannot be saved on the live site without Supabase. Add Supabase env vars and redeploy."
+    );
   }
 }

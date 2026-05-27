@@ -67,10 +67,17 @@ export async function confirmPayment(
   }
 
   const pending = await getPendingPayment(reference);
-  if (!pending) {
-    return false;
-  }
-  if (pending.courseSlug !== courseSlug || pending.provider !== provider) {
+  const slugFromRef = parseCourseSlugFromReference(reference);
+
+  if (pending) {
+    if (pending.courseSlug !== courseSlug || pending.provider !== provider) {
+      return false;
+    }
+  } else if (slugFromRef) {
+    if (slugFromRef !== courseSlug) {
+      return false;
+    }
+  } else {
     return false;
   }
 

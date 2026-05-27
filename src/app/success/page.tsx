@@ -50,8 +50,8 @@ function SuccessContent() {
     if (!reference || !provider) return;
 
     const grantAccess = async () => {
-      const maxAttempts = provider === "moolre" ? 8 : 1;
-      const delayMs = 2000;
+      const maxAttempts = provider === "moolre" ? 12 : 1;
+      const delayMs = 3000;
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {

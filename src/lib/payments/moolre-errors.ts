@@ -10,6 +10,7 @@ const MOOLRE_USER_MESSAGES: Record<string, string> = {
   TR03: "Enter a valid Ghana MoMo number starting with 0 (e.g. 0241234567). Do not include +233.",
   TP04: "Payment could not be started — merchant Moolre account or currency settings may be wrong.",
   TP01: "Mobile Money only accepts Ghana cedis (GHS). Set the course currency to GHS in Admin, then try again.",
+  TP13: "This payment reference was already used. Refresh checkout and try again.",
   INP02: "This payment was already started. Refresh checkout and try again.",
 };
 
@@ -34,19 +35,37 @@ export function moolreErrorMessage(code: string | undefined, fallback: string): 
   return fallback;
 }
 
-/** True when Moolre accepted the request and should have sent a MoMo approval prompt. */
+/** True when Moolre accepted the request and should have sent a MoMo approval prompt (code TR099 per docs). */
 export function isMoolrePromptSent(payload: {
   status?: number | string;
   code?: string;
   message?: string;
+  data?: unknown;
 }): boolean {
   const status = Number(payload.status);
   if (status !== 1) return false;
 
   const code = payload.code?.toUpperCase() ?? "";
-  const blocked = new Set(["TP14", "TP09", "TR03", "TP04", "TP01", "INP02", "PL02", "POS09", "AIN01", "AIN02"]);
+  const blocked = new Set([
+    "TP14",
+    "TP09",
+    "TR03",
+    "TP04",
+    "TP01",
+    "TP13",
+    "INP02",
+    "PL02",
+    "POS09",
+    "AIN01",
+    "AIN02",
+  ]);
   if (blocked.has(code)) return false;
-  if (code) return true;
+
+  // Official success code for /open/transact/payment
+  if (code === "TR099") return true;
+
+  // Some responses return a session UUID in data without a code
+  if (typeof payload.data === "string" && payload.data.length > 0) return true;
 
   return /prompt|pin|approve|initiated|sent|ussd/i.test(payload.message ?? "");
 }

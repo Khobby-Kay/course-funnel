@@ -1,8 +1,8 @@
-/** Ghana MoMo channel IDs for Moolre `/open/transact/payment` (override via env if needed). */
+/** Ghana MoMo channel IDs for Moolre `/open/transact/payment` — see docs.moolre.com/ai/initiate-payment.html */
 const DEFAULT_CHANNELS = {
-  mtn: 7,
+  mtn: 13,
   telecel: 6,
-  at: 13,
+  at: 7,
 } as const;
 
 function channelFromEnv(key: keyof typeof DEFAULT_CHANNELS): number {
