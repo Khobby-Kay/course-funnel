@@ -22,7 +22,10 @@ function getMoolreBaseUrl(): string {
 
 function getMoolreAccountHeaders(): Record<string, string> | null {
   const user = process.env.MOOLRE_API_USER?.trim();
-  const apiKey = process.env.MOOLRE_API_KEY?.trim();
+  const apiKey =
+    process.env.MOOLRE_API_KEY?.trim() ||
+    process.env.MOOLRE_SECRET_KEY?.trim() ||
+    process.env.MOOLRE_PUBLIC_KEY?.trim();
   if (!user || !apiKey) return null;
 
   return {
@@ -30,6 +33,10 @@ function getMoolreAccountHeaders(): Record<string, string> | null {
     "X-API-USER": user,
     "X-API-KEY": apiKey,
   };
+}
+
+function hasPrivateMoolreAccountKey(): boolean {
+  return Boolean(process.env.MOOLRE_API_KEY?.trim() || process.env.MOOLRE_SECRET_KEY?.trim());
 }
 
 export function isMoolreAccountApiConfigured(): boolean {
@@ -54,20 +61,28 @@ export async function getMoolreAccountStatus(): Promise<MoolreAccountResponse | 
   }
 }
 
-/** Enable API transactions + payment webhook on the merchant wallet (docs: open/account/update). */
+/** Enable API transactions + payment webhook on the merchant wallet (requires Private API Key). */
 export async function enableMoolreApiAccess(): Promise<{
   ok: boolean;
   code?: string;
   message?: string;
   apiEnabled?: boolean;
+  skipped?: boolean;
 }> {
+  if (!hasPrivateMoolreAccountKey()) {
+    return {
+      ok: true,
+      skipped: true,
+      message: "MOOLRE_API_KEY not set — skipping wallet update (payment API still uses MOOLRE_PUBLIC_KEY).",
+    };
+  }
+
   const headers = getMoolreAccountHeaders();
   const accountNumber = process.env.MOOLRE_ACCOUNT_NUMBER?.trim();
   if (!headers || !accountNumber) {
     return {
       ok: false,
-      message:
-        "MOOLRE_API_KEY is not set. Add your Private API Key from app.moolre.com (Profile → API Keys).",
+      message: "Moolre account credentials are not configured.",
     };
   }
 
