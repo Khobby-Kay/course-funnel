@@ -126,6 +126,12 @@ async function initializeMoolreDirectMomo(params: {
     };
   }
 
+  if (code === "TP14" && otp) {
+    throw new Error(
+      "That verification code did not work. Check the SMS from Moolre and try again."
+    );
+  }
+
   if (!isMoolrePromptSent(payload)) {
     const msg = moolreErrorMessage(
       payload.code,

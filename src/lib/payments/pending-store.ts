@@ -41,13 +41,15 @@ export async function recordPendingPayment(payment: PendingPayment): Promise<voi
   writePaymentRecords(CACHE_KEY, FILE_NAME, entries);
 
   if (isSupabaseConfigured()) {
-    await savePendingPaymentRemote(payment);
+    try {
+      await savePendingPaymentRemote(payment);
+    } catch {
+      // Memory/disk store still updated — do not block checkout
+    }
     return;
   }
 
   if (isServerlessDeploy()) {
-    throw new Error(
-      "Payment records cannot be saved on the live site without Supabase. Add Supabase env vars and redeploy."
-    );
+    return;
   }
 }

@@ -61,17 +61,21 @@ export async function initializePayment(
       result = await initializePaystack(input, pricing);
   }
 
-  await recordPendingPayment({
-    reference: result.reference,
-    courseSlug: input.courseSlug,
-    provider: result.provider,
-    createdAt: Date.now(),
-    name: input.name,
-    email: input.email,
-    phone: input.phone,
-    region: input.region,
-    countryCode: input.countryCode,
-  });
+  try {
+    await recordPendingPayment({
+      reference: result.reference,
+      courseSlug: input.courseSlug,
+      provider: result.provider,
+      createdAt: Date.now(),
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      region: input.region,
+      countryCode: input.countryCode,
+    });
+  } catch {
+    // Do not block MoMo prompt / OTP flow if pending record fails on serverless
+  }
 
   return result;
 }

@@ -65,7 +65,15 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
       throw new Error(result.error ?? "Could not start payment");
     }
 
-    if (result.momoOtpRequired) {
+    const needsOtp =
+      result.momoOtpRequired === true ||
+      result.moolreFlow === "momo-otp" ||
+      (result.provider === "moolre" &&
+        result.reference &&
+        !result.momoPrompt &&
+        !result.checkoutUrl);
+
+    if (needsOtp) {
       setOtpStep(true);
       setPendingReference(result.reference);
       setOtpNetwork(result.momoNetwork ?? detectedNetwork ?? "");
@@ -266,9 +274,9 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
               <section className="mb-6 rounded-xl border border-gold/40 bg-gold/10 p-4 space-y-3">
                 <p className="text-sm font-semibold">SMS verification required</p>
                 <p className="text-xs text-gray-muted">
-                  Moolre sent a verification code to your phone
-                  {otpNetwork ? ` (${otpNetwork})` : ""}. Enter it below, then we&apos;ll send the MoMo
-                  payment prompt.
+                  Moolre sent a verification code to <strong>{form.phone || "your phone"}</strong>
+                  {otpNetwork ? ` (${otpNetwork})` : ""}. Enter it below — then the MoMo payment prompt
+                  will appear on your phone.
                 </p>
                 <label className="block">
                   <span className="text-sm font-medium mb-1 block">Verification code</span>
