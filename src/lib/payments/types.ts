@@ -1,7 +1,7 @@
 export type PaymentProvider = "moolre" | "paystack" | "flutterwave" | "card";
 
-/** Moolre: phone USSD prompt vs hosted pos.moolre.com page */
-export type MoolreCheckoutFlow = "momo-prompt" | "hosted-link";
+/** Moolre: phone USSD prompt vs hosted pos.moolre.com page vs SMS OTP step */
+export type MoolreCheckoutFlow = "momo-prompt" | "momo-otp" | "hosted-link";
 
 export type InitializePaymentInput = {
   name: string;
@@ -11,6 +11,10 @@ export type InitializePaymentInput = {
   countryCode: string;
   provider: PaymentProvider;
   courseSlug: string;
+  /** Retry the same payment with the SMS code Moolre sent (TP14 flow). */
+  momoOtpCode?: string;
+  /** Reuse reference from a prior TP14 response — do not create a new payment. */
+  existingReference?: string;
 };
 
 export type CoursePricing = {
@@ -33,6 +37,8 @@ export type InitializePaymentResult = {
   moolreFallback?: boolean;
   /** Network label when a direct MoMo prompt was sent (e.g. "MTN MoMo"). */
   momoNetwork?: string;
+  /** Moolre sent an SMS verification code — customer must enter it and retry. */
+  momoOtpRequired?: boolean;
 };
 
 export type VerifyPaymentResult = {

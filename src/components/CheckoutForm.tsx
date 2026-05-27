@@ -39,8 +39,63 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [otpStep, setOtpStep] = useState(false);
+  const [pendingReference, setPendingReference] = useState("");
+  const [otpNetwork, setOtpNetwork] = useState("");
+  const [otpCode, setOtpCode] = useState("");
 
   const detectedNetwork = useMemo(() => momoNetworkHint(form.phone), [form.phone]);
+
+  const startPayment = async (options?: { momoOtpCode?: string; existingReference?: string }) => {
+    const response = await fetch("/api/payments/initialize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        provider: MOOLRE_PROVIDER,
+        courseSlug: data.slug,
+        momoOtpCode: options?.momoOtpCode,
+        existingReference: options?.existingReference,
+      }),
+    });
+
+    const result = (await response.json()) as InitializePaymentResult & { error?: string };
+
+    if (!response.ok) {
+      throw new Error(result.error ?? "Could not start payment");
+    }
+
+    if (result.momoOtpRequired) {
+      setOtpStep(true);
+      setPendingReference(result.reference);
+      setOtpNetwork(result.momoNetwork ?? detectedNetwork ?? "");
+      setOtpCode("");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const isMomoPrompt = result.moolreFlow === "momo-prompt" || result.momoPrompt === true;
+
+    if (isMomoPrompt) {
+      const params = new URLSearchParams({
+        reference: String(result.reference),
+        provider: "moolre",
+        course: data.slug,
+        momo: "1",
+      });
+      if (result.momoNetwork) params.set("network", result.momoNetwork);
+      window.location.href = `/success?${params.toString()}`;
+      return;
+    }
+
+    if (result.checkoutUrl) {
+      throw new Error(
+        "Phone prompt mode is required but a payment webpage was returned. Contact the course provider."
+      );
+    }
+
+    throw new Error("Payment could not be started. Please try again.");
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,41 +103,27 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/payments/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, provider: MOOLRE_PROVIDER, courseSlug: data.slug }),
-      });
-
-      const result = (await response.json()) as InitializePaymentResult & { error?: string };
-
-      if (!response.ok) {
-        throw new Error(result.error ?? "Could not start payment");
-      }
-
-      const isMomoPrompt = result.moolreFlow === "momo-prompt" || result.momoPrompt === true;
-
-      if (isMomoPrompt) {
-        const params = new URLSearchParams({
-          reference: String(result.reference),
-          provider: "moolre",
-          course: data.slug,
-          momo: "1",
-        });
-        if (result.momoNetwork) params.set("network", result.momoNetwork);
-        window.location.href = `/success?${params.toString()}`;
-        return;
-      }
-
-      if (result.checkoutUrl) {
-        throw new Error(
-          "Phone prompt mode is required but a payment webpage was returned. Contact the course provider."
-        );
-      }
-
-      throw new Error("Payment could not be started. Please try again.");
+      await startPayment();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOtpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!otpCode.trim() || !pendingReference) return;
+
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await startPayment({
+        momoOtpCode: otpCode.trim(),
+        existingReference: pendingReference,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -90,8 +131,12 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
   const totalValue = valueStack.reduce((sum, item) => sum + item.value, 0);
 
   const submitLabel = isSubmitting
-    ? "Sending MoMo prompt to your phone…"
-    : `Pay ${course.currency} ${course.price} with MoMo`;
+    ? otpStep
+      ? "Confirming code…"
+      : "Sending MoMo prompt to your phone…"
+    : otpStep
+      ? "Confirm & send MoMo prompt"
+      : `Pay ${course.currency} ${course.price} with MoMo`;
 
   return (
     <main className="min-h-screen bg-gray-light">
@@ -163,7 +208,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
           </aside>
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={otpStep ? handleOtpSubmit : handleSubmit}
             className="rounded-2xl bg-white p-6 sm:p-8 border border-black/5 shadow-sm"
             noValidate
           >
@@ -217,20 +262,62 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
               />
             </fieldset>
 
-            <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4 space-y-2">
-              <p className="text-sm font-semibold text-purple">{paymentOption?.label ?? "Mobile Money"}</p>
-              <p className="text-xs text-gray-muted">
-                After you pay, approve the charge on your phone{detectedNetwork ? ` (${detectedNetwork})` : ""}.
-                Enter your MoMo PIN when prompted — your course unlocks automatically.
-              </p>
-              <ol className="text-xs text-gray-muted list-decimal list-inside space-y-1 pt-1">
-                <li>Tap Pay below</li>
-                <li>Check your phone for the MoMo approval request</li>
-                <li>Enter your PIN to confirm</li>
-              </ol>
-            </section>
+            {otpStep && (
+              <section className="mb-6 rounded-xl border border-gold/40 bg-gold/10 p-4 space-y-3">
+                <p className="text-sm font-semibold">SMS verification required</p>
+                <p className="text-xs text-gray-muted">
+                  Moolre sent a verification code to your phone
+                  {otpNetwork ? ` (${otpNetwork})` : ""}. Enter it below, then we&apos;ll send the MoMo
+                  payment prompt.
+                </p>
+                <label className="block">
+                  <span className="text-sm font-medium mb-1 block">Verification code</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-black/10 focus:border-purple focus:outline-none focus:ring-2 focus:ring-purple/20 tracking-widest"
+                    placeholder="Enter SMS code"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="text-xs text-purple hover:underline"
+                  onClick={() => {
+                    setOtpStep(false);
+                    setPendingReference("");
+                    setOtpCode("");
+                  }}
+                >
+                  Start over
+                </button>
+              </section>
+            )}
 
-            <Button type="submit" size="lg" className="w-full mb-4" disabled={isSubmitting}>
+            {!otpStep && (
+              <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4 space-y-2">
+                <p className="text-sm font-semibold text-purple">{paymentOption?.label ?? "Mobile Money"}</p>
+                <p className="text-xs text-gray-muted">
+                  After you pay, approve the charge on your phone{detectedNetwork ? ` (${detectedNetwork})` : ""}.
+                  Enter your MoMo PIN when prompted — your course unlocks automatically.
+                </p>
+                <ol className="text-xs text-gray-muted list-decimal list-inside space-y-1 pt-1">
+                  <li>Tap Pay below</li>
+                  <li>Check your phone for the MoMo approval request</li>
+                  <li>Enter your PIN to confirm</li>
+                </ol>
+              </section>
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full mb-4"
+              disabled={isSubmitting || (otpStep && !otpCode.trim())}
+            >
               {submitLabel}
             </Button>
 

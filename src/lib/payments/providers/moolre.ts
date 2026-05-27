@@ -6,13 +6,14 @@ import {
   type MoolreStatusPayload,
 } from "../moolre-status";
 import { assertMoolreCurrency } from "../moolre-currency";
+import { ensureMoolreApiEnabled } from "../moolre-account";
 import { isMoolrePromptSent, moolreErrorMessage } from "../moolre-errors";
 import { prefersDirectMomoPrompt } from "../moolre-config";
 import { normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone, moolreNetworkLabel } from "../moolre-phone";
 import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
 
 type MoolreApiResponse = {
-  status: number | string;
+  status?: number | string;
   code?: string;
   message?: string;
   data?: unknown;
@@ -48,9 +49,11 @@ export async function initializeMoolre(
     throw new Error("Moolre is not configured");
   }
 
-  const reference = createPaymentReference("moolre", pricing.slug);
+  const reference =
+    input.existingReference?.trim() || createPaymentReference("moolre", pricing.slug);
 
   if (prefersDirectMomoPrompt()) {
+    await ensureMoolreApiEnabled();
     return initializeMoolreDirectMomo({
       input,
       pricing,
@@ -82,19 +85,26 @@ async function initializeMoolreDirectMomo(params: {
   const payer = normalizeGhanaMoMoPhone(params.input.phone);
   const channel = String(resolveMoolreChannelFromPhone(payer));
   const currency = assertMoolreCurrency(params.pricing.currency);
+  const otp = params.input.momoOtpCode?.trim();
+
+  const requestBody: Record<string, string | number> = {
+    type: 1,
+    amount: String(params.pricing.price),
+    externalref: params.reference,
+    currency,
+    accountnumber: params.accountNumber,
+    payer,
+    channel,
+  };
+
+  if (otp) {
+    requestBody.otpcode = otp;
+  }
 
   const response = await fetch(`${getMoolreBaseUrl()}/open/transact/payment`, {
     method: "POST",
     headers: getMoolreHeaders(),
-    body: JSON.stringify({
-      type: 1,
-      amount: String(params.pricing.price),
-      externalref: params.reference,
-      currency,
-      accountnumber: params.accountNumber,
-      payer,
-      channel,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   let payload: MoolreApiResponse;
@@ -102,6 +112,18 @@ async function initializeMoolreDirectMomo(params: {
     payload = (await response.json()) as MoolreApiResponse;
   } catch {
     throw new Error("Could not reach Moolre. Please try again.");
+  }
+
+  const code = payload.code?.toUpperCase() ?? "";
+
+  if (code === "TP14" && !otp) {
+    return {
+      reference: params.reference,
+      provider: "moolre",
+      momoOtpRequired: true,
+      moolreFlow: "momo-otp",
+      momoNetwork: moolreNetworkLabel(payer),
+    };
   }
 
   if (!isMoolrePromptSent(payload)) {
@@ -121,7 +143,7 @@ async function initializeMoolreDirectMomo(params: {
   };
 }
 
-/** Hosted pos.moolre.com page — disabled in production unless MOOLRE_ALLOW_HOSTED_LINK=true. */
+/** Hosted pos.moolre.com page — disabled unless MOOLRE_ALLOW_HOSTED_LINK=true. */
 async function initializeMoolreHostedLink(params: {
   input: InitializePaymentInput;
   pricing: CoursePricing;

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "setup:supabase": "node scripts/setup-supabase.mjs",
+    "setup:moolre": "node scripts/setup-moolre.mjs",
     "migrate:courses": "node scripts/migrate-courses-to-supabase.mjs",
     "sync:vercel:supabase": "node scripts/sync-vercel-supabase-env.mjs"
   },

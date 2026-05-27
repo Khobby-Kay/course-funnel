@@ -15,12 +15,24 @@ type Body = {
   countryCode?: string;
   provider?: PaymentProvider;
   courseSlug?: string;
+  momoOtpCode?: string;
+  existingReference?: string;
 };
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Body;
-    const { name, email, phone, region, countryCode, provider, courseSlug } = body;
+    const {
+      name,
+      email,
+      phone,
+      region,
+      countryCode,
+      provider,
+      courseSlug,
+      momoOtpCode,
+      existingReference,
+    } = body;
 
     if (!name?.trim() || !email?.trim() || !phone?.trim() || !region?.trim() || !provider || !courseSlug?.trim()) {
       return NextResponse.json({ error: "Please fill in all required fields, including your region." }, { status: 400 });
@@ -71,6 +83,8 @@ export async function POST(request: Request) {
       countryCode: (countryCode?.trim() || DEFAULT_COUNTRY_CODE).toUpperCase(),
       provider,
       courseSlug: course.slug,
+      momoOtpCode: momoOtpCode?.trim(),
+      existingReference: existingReference?.trim(),
     });
 
     return NextResponse.json(result);
