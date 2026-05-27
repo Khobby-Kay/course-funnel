@@ -38,7 +38,6 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
     countryCode: DEFAULT_COUNTRY_CODE,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitPhase, setSubmitPhase] = useState<"momo" | "link">("momo");
   const [error, setError] = useState("");
 
   const detectedNetwork = useMemo(() => momoNetworkHint(form.phone), [form.phone]);
@@ -47,7 +46,6 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
     event.preventDefault();
     setError("");
     setIsSubmitting(true);
-    setSubmitPhase("momo");
 
     try {
       const response = await fetch("/api/payments/initialize", {
@@ -62,8 +60,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
         throw new Error(result.error ?? "Could not start payment");
       }
 
-      const isMomoPrompt =
-        result.moolreFlow === "momo-prompt" || (result.momoPrompt === true && !result.checkoutUrl);
+      const isMomoPrompt = result.moolreFlow === "momo-prompt" || result.momoPrompt === true;
 
       if (isMomoPrompt) {
         const params = new URLSearchParams({
@@ -78,9 +75,9 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
       }
 
       if (result.checkoutUrl) {
-        setSubmitPhase("link");
-        window.location.href = result.checkoutUrl;
-        return;
+        throw new Error(
+          "Phone prompt mode is required but a payment webpage was returned. Contact the course provider."
+        );
       }
 
       throw new Error("Payment could not be started. Please try again.");
@@ -93,9 +90,7 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
   const totalValue = valueStack.reduce((sum, item) => sum + item.value, 0);
 
   const submitLabel = isSubmitting
-    ? submitPhase === "link"
-      ? "Opening Moolre payment page…"
-      : "Sending MoMo prompt to your phone…"
+    ? "Sending MoMo prompt to your phone…"
     : `Pay ${course.currency} ${course.price} with MoMo`;
 
   return (

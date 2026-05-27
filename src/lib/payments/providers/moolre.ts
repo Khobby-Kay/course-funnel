@@ -15,15 +15,7 @@ type MoolreApiResponse = {
   status: number | string;
   code?: string;
   message?: string;
-  data?: {
-    authorization_url?: string;
-    reference?: string;
-    externalref?: string;
-    txstatus?: number | string;
-    amount?: number | string;
-    currency?: string;
-    metadata?: Record<string, unknown>;
-  };
+  data?: unknown;
 };
 
 function getMoolreBaseUrl(): string {
@@ -45,10 +37,6 @@ function getMoolreHeaders(): Record<string, string> {
   return headers;
 }
 
-function useDirectMomoFlow(): boolean {
-  return prefersDirectMomoPrompt();
-}
-
 export async function initializeMoolre(
   input: InitializePaymentInput,
   pricing: CoursePricing
@@ -61,41 +49,35 @@ export async function initializeMoolre(
   }
 
   const reference = createPaymentReference("moolre", pricing.slug);
-  const appUrl = getAppUrl();
-  const successBase = `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}`;
-  const redirectMomo = `${successBase}&momo=1`;
-  const redirectHosted = successBase;
 
-  if (useDirectMomoFlow()) {
+  if (prefersDirectMomoPrompt()) {
     return initializeMoolreDirectMomo({
       input,
       pricing,
       reference,
       accountNumber,
-      redirectMomo,
-      redirectHosted,
-      appUrl,
     });
   }
+
+  const appUrl = getAppUrl();
+  const redirect = `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}`;
 
   return initializeMoolreHostedLink({
     input,
     pricing,
     reference,
     accountNumber,
-    redirect: redirectHosted,
+    redirect,
     appUrl,
   });
 }
 
+/** Send a USSD/MoMo approval prompt to the customer's phone — no webpage. */
 async function initializeMoolreDirectMomo(params: {
   input: InitializePaymentInput;
   pricing: CoursePricing;
   reference: string;
   accountNumber: string;
-  redirectMomo: string;
-  redirectHosted: string;
-  appUrl: string;
 }): Promise<InitializePaymentResult> {
   const payer = normalizeGhanaMoMoPhone(params.input.phone);
   const channel = String(resolveMoolreChannelFromPhone(payer));
@@ -111,30 +93,21 @@ async function initializeMoolreDirectMomo(params: {
       currency,
       accountnumber: params.accountNumber,
       payer,
-      channel: String(channel),
+      channel,
     }),
   });
 
-  const payload = (await response.json()) as MoolreApiResponse;
+  let payload: MoolreApiResponse;
+  try {
+    payload = (await response.json()) as MoolreApiResponse;
+  } catch {
+    throw new Error("Could not reach Moolre. Please try again.");
+  }
 
   if (!isMoolrePromptSent(payload)) {
-    const code = payload.code?.toUpperCase() ?? "";
-    // TP14 = merchant SMS/API verification incomplete — hosted link still works
-    if (code === "TP14" || code === "TP09") {
-      return initializeMoolreHostedLink({
-        input: params.input,
-        pricing: params.pricing,
-        reference: params.reference,
-        accountNumber: params.accountNumber,
-        redirect: params.redirectHosted,
-        appUrl: params.appUrl,
-        fallbackFromDirect: true,
-      });
-    }
-
     const msg = moolreErrorMessage(
       payload.code,
-      payload.message || "Could not send Mobile Money prompt. Please try again."
+      payload.message || "Could not send Mobile Money prompt to your phone. Please try again."
     );
     throw new Error(msg);
   }
@@ -148,7 +121,7 @@ async function initializeMoolreDirectMomo(params: {
   };
 }
 
-/** Hosted payment page at pos.moolre.com — fallback when direct API is not active (TP14). */
+/** Hosted pos.moolre.com page — disabled in production unless MOOLRE_ALLOW_HOSTED_LINK=true. */
 async function initializeMoolreHostedLink(params: {
   input: InitializePaymentInput;
   pricing: CoursePricing;
@@ -156,7 +129,6 @@ async function initializeMoolreHostedLink(params: {
   accountNumber: string;
   redirect: string;
   appUrl: string;
-  fallbackFromDirect?: boolean;
 }): Promise<InitializePaymentResult> {
   const currency = assertMoolreCurrency(params.pricing.currency);
 
@@ -182,7 +154,9 @@ async function initializeMoolreHostedLink(params: {
     }),
   });
 
-  const payload = (await response.json()) as MoolreApiResponse;
+  const payload = (await response.json()) as MoolreApiResponse & {
+    data?: { authorization_url?: string };
+  };
   const checkoutUrl = payload.data?.authorization_url;
 
   if (!response.ok || Number(payload.status) !== 1 || !checkoutUrl) {
@@ -196,7 +170,6 @@ async function initializeMoolreHostedLink(params: {
     reference: params.reference,
     provider: "moolre",
     moolreFlow: "hosted-link",
-    moolreFallback: params.fallbackFromDirect === true,
   };
 }
 

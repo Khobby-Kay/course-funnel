@@ -4,9 +4,9 @@ const MOOLRE_USER_MESSAGES: Record<string, string> = {
   AIN02:
     "Moolre public key is invalid or missing. Copy the Public API Key from app.moolre.com into MOOLRE_PUBLIC_KEY on Vercel, then redeploy.",
   TP14:
-    "Direct Mobile Money prompts are not enabled on your Moolre account yet. Complete SMS verification at app.moolre.com, or checkout will open Moolre's payment page instead.",
+    "Mobile Money phone prompts are not enabled on this Moolre merchant account yet. The store owner must complete API verification at app.moolre.com (or contact Moolre support to enable /open/transact/payment).",
   TP09:
-    "This mobile network is not enabled for API payments on the merchant Moolre account. Try MTN, Telecel, or AT — or contact the course provider.",
+    "This mobile network is not enabled for API payments on the merchant Moolre account. Contact Moolre support or try a different network.",
   TR03: "Enter a valid Ghana MoMo number starting with 0 (e.g. 0241234567). Do not include +233.",
   TP04: "Payment could not be started — merchant Moolre account or currency settings may be wrong.",
   TP01: "Mobile Money only accepts Ghana cedis (GHS). Set the course currency to GHS in Admin, then try again.",
@@ -35,7 +35,21 @@ export function moolreErrorMessage(code: string | undefined, fallback: string): 
   return fallback;
 }
 
-/** True when Moolre accepted the request and should have sent a MoMo approval prompt (code TR099 per docs). */
+const PROMPT_BLOCKED_CODES = new Set([
+  "TP14",
+  "TP09",
+  "TR03",
+  "TP04",
+  "TP01",
+  "TP13",
+  "INP02",
+  "PL02",
+  "POS09",
+  "AIN01",
+  "AIN02",
+]);
+
+/** True when Moolre accepted /open/transact/payment and sent a MoMo approval prompt to the phone. */
 export function isMoolrePromptSent(payload: {
   status?: number | string;
   code?: string;
@@ -46,26 +60,16 @@ export function isMoolrePromptSent(payload: {
   if (status !== 1) return false;
 
   const code = payload.code?.toUpperCase() ?? "";
-  const blocked = new Set([
-    "TP14",
-    "TP09",
-    "TR03",
-    "TP04",
-    "TP01",
-    "TP13",
-    "INP02",
-    "PL02",
-    "POS09",
-    "AIN01",
-    "AIN02",
-  ]);
-  if (blocked.has(code)) return false;
+  if (PROMPT_BLOCKED_CODES.has(code)) return false;
 
-  // Official success code for /open/transact/payment
+  // Official success: TR099 + session UUID in data (docs.moolre.com/ai/initiate-payment.html)
   if (code === "TR099") return true;
+  if (typeof payload.data === "string" && payload.data.length > 0 && payload.data !== "all") {
+    return true;
+  }
 
-  // Some responses return a session UUID in data without a code
-  if (typeof payload.data === "string" && payload.data.length > 0) return true;
+  // Other success codes from Moolre (not in block list)
+  if (code) return true;
 
   return /prompt|pin|approve|initiated|sent|ussd/i.test(payload.message ?? "");
 }
