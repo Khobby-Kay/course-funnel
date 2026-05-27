@@ -61,7 +61,9 @@ export async function initializeMoolre(
 
   const reference = createPaymentReference("moolre", pricing.slug);
   const appUrl = getAppUrl();
-  const redirect = `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}&momo=1`;
+  const successBase = `${appUrl}/success?reference=${encodeURIComponent(reference)}&provider=moolre&course=${encodeURIComponent(pricing.slug)}`;
+  const redirectMomo = `${successBase}&momo=1`;
+  const redirectHosted = successBase;
 
   if (useDirectMomoFlow()) {
     return initializeMoolreDirectMomo({
@@ -69,7 +71,8 @@ export async function initializeMoolre(
       pricing,
       reference,
       accountNumber,
-      redirect,
+      redirectMomo,
+      redirectHosted,
       appUrl,
     });
   }
@@ -79,7 +82,7 @@ export async function initializeMoolre(
     pricing,
     reference,
     accountNumber,
-    redirect,
+    redirect: redirectHosted,
     appUrl,
   });
 }
@@ -89,7 +92,8 @@ async function initializeMoolreDirectMomo(params: {
   pricing: CoursePricing;
   reference: string;
   accountNumber: string;
-  redirect: string;
+  redirectMomo: string;
+  redirectHosted: string;
   appUrl: string;
 }): Promise<InitializePaymentResult> {
   const payer = normalizeGhanaMoMoPhone(params.input.phone);
@@ -113,6 +117,19 @@ async function initializeMoolreDirectMomo(params: {
   const payload = (await response.json()) as MoolreApiResponse;
 
   if (!isMoolrePromptSent(payload)) {
+    const code = payload.code?.toUpperCase() ?? "";
+    // TP14 = merchant SMS/API verification incomplete — hosted link still works
+    if (code === "TP14" || code === "TP09") {
+      return initializeMoolreHostedLink({
+        input: params.input,
+        pricing: params.pricing,
+        reference: params.reference,
+        accountNumber: params.accountNumber,
+        redirect: params.redirectHosted,
+        appUrl: params.appUrl,
+      });
+    }
+
     const msg = moolreErrorMessage(
       payload.code,
       payload.message || "Could not send Mobile Money prompt. Please try again."
@@ -127,7 +144,7 @@ async function initializeMoolreDirectMomo(params: {
   };
 }
 
-/** Legacy hosted POS link — requires customer login on pos.moolre.com; avoid in production. */
+/** Hosted payment page at pos.moolre.com — works before direct API verification (TP14). */
 async function initializeMoolreHostedLink(params: {
   input: InitializePaymentInput;
   pricing: CoursePricing;

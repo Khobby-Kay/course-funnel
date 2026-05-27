@@ -4,7 +4,7 @@ const MOOLRE_USER_MESSAGES: Record<string, string> = {
   AIN02:
     "Moolre public key is invalid or missing. Copy the Public API Key from app.moolre.com into MOOLRE_PUBLIC_KEY on Vercel, then redeploy.",
   TP14:
-    "Mobile Money setup is incomplete on the merchant Moolre account. The store owner must log in at app.moolre.com and complete SMS verification, then try again.",
+    "Direct Mobile Money prompts are not enabled on your Moolre account yet. Complete SMS verification at app.moolre.com, or checkout will open Moolre's payment page instead.",
   TP09:
     "This mobile network is not enabled for API payments on the merchant Moolre account. Try MTN, Telecel, or AT — or contact the course provider.",
   TR03: "Enter a valid Ghana MoMo number starting with 0 (e.g. 0241234567). Do not include +233.",
