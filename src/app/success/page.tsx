@@ -31,6 +31,7 @@ function SuccessContent() {
   const provider = searchParams.get("provider") as PaymentProvider | "demo" | null;
   const courseFromUrl = searchParams.get("course")?.trim() || "";
   const momoPrompt = searchParams.get("momo") === "1";
+  const momoNetwork = searchParams.get("network")?.trim() || "";
 
   const [grantedCourseSlug, setGrantedCourseSlug] = useState<string | null>(null);
   const [confirmationEmailSent, setConfirmationEmailSent] = useState(false);
@@ -113,15 +114,24 @@ function SuccessContent() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center px-4 text-center max-w-md mx-auto">
-        <p className="text-white/70">
-          {momoPrompt
-            ? "Approve the Mobile Money prompt on your phone, then wait while we confirm…"
-            : "Confirming your payment and unlocking your course…"}
-        </p>
-        <p className="text-white/40 text-sm mt-2">
-          MoMo payments can take a few seconds after you enter your PIN.
-        </p>
+      <main className="min-h-screen bg-black flex flex-col items-center justify-center px-4 text-center max-w-md mx-auto gap-4">
+        {momoPrompt ? (
+          <>
+            <p className="text-white font-semibold text-lg">Check your phone</p>
+            <p className="text-white/70">
+              A Mobile Money payment request{momoNetwork ? ` for ${momoNetwork}` : ""} was sent to your
+              number. Enter your MoMo PIN to approve the charge.
+            </p>
+            <ol className="text-white/50 text-sm text-left list-decimal list-inside space-y-1 w-full max-w-xs">
+              <li>Open the MoMo prompt on your phone</li>
+              <li>Confirm the amount and enter your PIN</li>
+              <li>Keep this page open — we&apos;ll unlock your course automatically</li>
+            </ol>
+          </>
+        ) : (
+          <p className="text-white/70">Confirming your payment and unlocking your course…</p>
+        )}
+        <p className="text-white/40 text-sm">This usually takes a few seconds after you approve.</p>
       </main>
     );
   }

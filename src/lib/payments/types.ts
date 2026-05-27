@@ -1,5 +1,8 @@
 export type PaymentProvider = "moolre" | "paystack" | "flutterwave" | "card";
 
+/** Moolre: phone USSD prompt vs hosted pos.moolre.com page */
+export type MoolreCheckoutFlow = "momo-prompt" | "hosted-link";
+
 export type InitializePaymentInput = {
   name: string;
   email: string;
@@ -18,12 +21,18 @@ export type CoursePricing = {
 };
 
 export type InitializePaymentResult = {
-  /** Hosted checkout URL (Paystack/Flutterwave). Omitted for direct MoMo prompt. */
+  /** Hosted checkout URL (Paystack/Flutterwave/Moolre link). Omitted for direct MoMo prompt. */
   checkoutUrl?: string;
   reference: string;
   provider: PaymentProvider;
   /** Customer approves payment on their phone — no third-party login page. */
   momoPrompt?: boolean;
+  /** Present for Moolre — tells the client which UX to show. */
+  moolreFlow?: MoolreCheckoutFlow;
+  /** True when direct MoMo was unavailable (e.g. TP14) and hosted link was used instead. */
+  moolreFallback?: boolean;
+  /** Network label when a direct MoMo prompt was sent (e.g. "MTN MoMo"). */
+  momoNetwork?: string;
 };
 
 export type VerifyPaymentResult = {

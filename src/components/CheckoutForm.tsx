@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import CountryPhoneFields from "@/components/checkout/CountryPhoneFields";
@@ -9,13 +9,22 @@ import CheckMark from "@/components/ui/CheckMark";
 import { ACTIVE_PAYMENT_OPTIONS } from "@/lib/constants";
 import type { CoursePageData } from "@/lib/courses/types";
 import { DEFAULT_COUNTRY_CODE } from "@/lib/geo/countries";
-import type { PaymentProvider } from "@/lib/payments/types";
+import { moolreNetworkLabel, normalizeGhanaMoMoPhone } from "@/lib/payments/moolre-phone";
+import type { InitializePaymentResult, PaymentProvider } from "@/lib/payments/types";
 
 type CheckoutFormProps = {
   data: CoursePageData;
 };
 
 const MOOLRE_PROVIDER: PaymentProvider = "moolre";
+
+function momoNetworkHint(phone: string): string | null {
+  try {
+    return moolreNetworkLabel(normalizeGhanaMoMoPhone(phone));
+  } catch {
+    return null;
+  }
+}
 
 export default function CheckoutForm({ data }: CheckoutFormProps) {
   const { course, valueStack, checkoutIncluded, landingPath, badge, brandName, media } = data;
@@ -29,12 +38,16 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
     countryCode: DEFAULT_COUNTRY_CODE,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitPhase, setSubmitPhase] = useState<"momo" | "link">("momo");
   const [error, setError] = useState("");
+
+  const detectedNetwork = useMemo(() => momoNetworkHint(form.phone), [form.phone]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setIsSubmitting(true);
+    setSubmitPhase("momo");
 
     try {
       const response = await fetch("/api/payments/initialize", {
@@ -43,24 +56,34 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
         body: JSON.stringify({ ...form, provider: MOOLRE_PROVIDER, courseSlug: data.slug }),
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as InitializePaymentResult & { error?: string };
 
       if (!response.ok) {
         throw new Error(result.error ?? "Could not start payment");
       }
 
-      if (result.momoPrompt || !result.checkoutUrl) {
+      const isMomoPrompt =
+        result.moolreFlow === "momo-prompt" || (result.momoPrompt === true && !result.checkoutUrl);
+
+      if (isMomoPrompt) {
         const params = new URLSearchParams({
           reference: String(result.reference),
           provider: "moolre",
           course: data.slug,
           momo: "1",
         });
+        if (result.momoNetwork) params.set("network", result.momoNetwork);
         window.location.href = `/success?${params.toString()}`;
         return;
       }
 
-      window.location.href = result.checkoutUrl as string;
+      if (result.checkoutUrl) {
+        setSubmitPhase("link");
+        window.location.href = result.checkoutUrl;
+        return;
+      }
+
+      throw new Error("Payment could not be started. Please try again.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
       setIsSubmitting(false);
@@ -68,6 +91,12 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
   };
 
   const totalValue = valueStack.reduce((sum, item) => sum + item.value, 0);
+
+  const submitLabel = isSubmitting
+    ? submitPhase === "link"
+      ? "Opening Moolre payment page…"
+      : "Sending MoMo prompt to your phone…"
+    : `Pay ${course.currency} ${course.price} with MoMo`;
 
   return (
     <main className="min-h-screen bg-gray-light">
@@ -83,8 +112,8 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
       <article className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center">Complete your enrollment</h1>
         <p className="text-gray-muted text-center mb-8 max-w-lg mx-auto">
-          A few details and we&apos;ll send a Mobile Money prompt to your phone for{" "}
-          <strong>{course.title}</strong>.
+          Enter your MoMo number — we&apos;ll send a payment prompt straight to your phone for{" "}
+          <strong>{course.title}</strong>. No login or redirect needed.
         </p>
 
         <section className="grid lg:grid-cols-2 gap-8">
@@ -193,17 +222,21 @@ export default function CheckoutForm({ data }: CheckoutFormProps) {
               />
             </fieldset>
 
-            <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4">
+            <section className="mb-6 rounded-xl border border-purple/20 bg-purple/5 p-4 space-y-2">
               <p className="text-sm font-semibold text-purple">{paymentOption?.label ?? "Mobile Money"}</p>
-              <p className="text-xs text-gray-muted mt-1">
-                After you submit, approve the charge on your phone (MTN, Telecel, or AT). No account login required.
+              <p className="text-xs text-gray-muted">
+                After you pay, approve the charge on your phone{detectedNetwork ? ` (${detectedNetwork})` : ""}.
+                Enter your MoMo PIN when prompted — your course unlocks automatically.
               </p>
+              <ol className="text-xs text-gray-muted list-decimal list-inside space-y-1 pt-1">
+                <li>Tap Pay below</li>
+                <li>Check your phone for the MoMo approval request</li>
+                <li>Enter your PIN to confirm</li>
+              </ol>
             </section>
 
             <Button type="submit" size="lg" className="w-full mb-4" disabled={isSubmitting}>
-              {isSubmitting
-                ? "Sending MoMo prompt to your phone…"
-                : `Pay ${course.currency} ${course.price} with MoMo`}
+              {submitLabel}
             </Button>
 
             <p className="text-center text-xs text-gray-muted mb-4">

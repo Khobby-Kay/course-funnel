@@ -7,7 +7,8 @@ import {
 } from "../moolre-status";
 import { assertMoolreCurrency } from "../moolre-currency";
 import { isMoolrePromptSent, moolreErrorMessage } from "../moolre-errors";
-import { normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone } from "../moolre-phone";
+import { prefersDirectMomoPrompt } from "../moolre-config";
+import { normalizeGhanaMoMoPhone, resolveMoolreChannelFromPhone, moolreNetworkLabel } from "../moolre-phone";
 import { createPaymentReference, getAppUrl, parseCourseSlugFromReference } from "../utils";
 
 type MoolreApiResponse = {
@@ -45,7 +46,7 @@ function getMoolreHeaders(): Record<string, string> {
 }
 
 function useDirectMomoFlow(): boolean {
-  return process.env.MOOLRE_PAYMENT_MODE?.trim().toLowerCase() !== "link";
+  return prefersDirectMomoPrompt();
 }
 
 export async function initializeMoolre(
@@ -127,6 +128,7 @@ async function initializeMoolreDirectMomo(params: {
         accountNumber: params.accountNumber,
         redirect: params.redirectHosted,
         appUrl: params.appUrl,
+        fallbackFromDirect: true,
       });
     }
 
@@ -141,10 +143,12 @@ async function initializeMoolreDirectMomo(params: {
     reference: params.reference,
     provider: "moolre",
     momoPrompt: true,
+    moolreFlow: "momo-prompt",
+    momoNetwork: moolreNetworkLabel(payer),
   };
 }
 
-/** Hosted payment page at pos.moolre.com — works before direct API verification (TP14). */
+/** Hosted payment page at pos.moolre.com — fallback when direct API is not active (TP14). */
 async function initializeMoolreHostedLink(params: {
   input: InitializePaymentInput;
   pricing: CoursePricing;
@@ -152,6 +156,7 @@ async function initializeMoolreHostedLink(params: {
   accountNumber: string;
   redirect: string;
   appUrl: string;
+  fallbackFromDirect?: boolean;
 }): Promise<InitializePaymentResult> {
   const currency = assertMoolreCurrency(params.pricing.currency);
 
@@ -190,6 +195,8 @@ async function initializeMoolreHostedLink(params: {
     checkoutUrl,
     reference: params.reference,
     provider: "moolre",
+    moolreFlow: "hosted-link",
+    moolreFallback: params.fallbackFromDirect === true,
   };
 }
 
